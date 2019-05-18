@@ -1,0 +1,10 @@
+.idea/
+venv/
+data/
+src/resources/__pycache__/
+*/__pycache__/
+src/network/__pycache__/
+models/
+*.png
+*.jpg
+GAN/data/*
