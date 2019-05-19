@@ -23,6 +23,7 @@ While training on condition a) 8 000 training and 2 000 validation samples from 
 ## Conditional GAN
 Conditional GAN algorithm is used instead of classic GAN to ensure balance
 between classes of created images.
+It is trained on 10 k of MNIST images to simulate "small" dataset.
 
 Results of the last epoch:
 
