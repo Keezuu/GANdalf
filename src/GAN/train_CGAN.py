@@ -8,6 +8,7 @@ from torch.autograd import Variable
 import matplotlib.pyplot as plt
 import pylab
 import numpy as np
+import torch.utils.data
 # Hyper-parameters
 from torchvision.transforms import transforms
 
@@ -34,8 +35,10 @@ mnist = torchvision.datasets.MNIST(root=cnst.DATA_DIR,
                                    train=True,
                                    transform=transform,
                                    download=True)
-
+subset_indices = [x for x in range (cnst.GAN_MNIST_TRAINING_SIZE)]
+mnist = torch.utils.data.Subset(mnist, subset_indices)
 # Create data loader with shuffling allowed
+
 data_loader = torch.utils.data.DataLoader(dataset=mnist,
                                           batch_size=cnst.GAN_BATCH_SIZE,
                                           shuffle=True)
@@ -65,7 +68,7 @@ def sample_image(n_row, epoch):
     labels = Variable(LongTensor(labels))
     gen_imgs = G(z, labels)
     save_image(gen_imgs.reshape(gen_imgs.shape[0], 1, gen_imgs.shape[1], gen_imgs.shape[2]).data,
-               os.path.join(cnst.GAN_SAMPLES_DIR, epoch+".png"), nrow=n_row, normalize=True)
+               os.path.join(cnst.GAN_SAMPLES_DIR, str(epoch)+".png"), nrow=n_row, normalize=True)
 
 
 def denorm(x):
