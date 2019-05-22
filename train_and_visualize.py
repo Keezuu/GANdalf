@@ -6,10 +6,6 @@ import src.resources.utilities as utils
 import matplotlib.pyplot as plt
 import src.resources.constants as cnst
 import numpy as np
-import sklearn.utils
-# --------------------------
-# Script made to automatize learning the CNN on different data
-# --------------------------
 
 def load_mixed_data():
     (x_train, y_train), (x_test, y_test) = utils.load_data(cnst.IMGS_AMOUNT, cnst.VAL_SPLIT)
@@ -18,9 +14,6 @@ def load_mixed_data():
     y_train = np.concatenate((y_train, yg_train))
     x_test = np.concatenate((x_test, xg_test))
     y_test = np.concatenate((y_test, yg_test))
-    # Shuffle labels and data the same way so they are not misaligned
-    sklearn.utils.shuffle(x_train, y_train)
-    sklearn.utils.shuffle(x_test, y_test)
     return (x_train, y_train), (x_test, y_test)
 
 
@@ -31,9 +24,6 @@ def load_mixed_data_flat():
     y_train = np.concatenate((y_train, yg_train))
     x_test = np.concatenate((x_test, xg_test))
     y_test = np.concatenate((y_test, yg_test))
-    # Shuffle labels and data the same way so they are not misaligned
-    sklearn.utils.shuffle(x_train, y_train)
-    sklearn.utils.shuffle(x_test, y_test)
     return (x_train, y_train), (x_test, y_test)
 
 
@@ -49,11 +39,29 @@ def load_gan_train_mnist_val_data_flat():
     return (xg_train, yg_train), (x_test, y_test)
 
 
+# Starts the training and evaluation of feed forward neural network on MNIST dataset
+def run_ffn():
+    ffn = FFN()
+    (x_train, y_train), (x_test, y_test) = utils.load_data_flat(cnst.IMGS_AMOUNT, cnst.VAL_SPLIT)
+    history = ffn.train(x_train, y_train, x_test, y_test)
+    return history
+
+
 # Starts the training and evaluation of convolutional neural network on MNIST dataset
 def run_cnn():
     cnn = CNN()
     (x_train, y_train), (x_test, y_test) = utils.load_data(cnst.IMGS_AMOUNT, cnst.VAL_SPLIT)
     history = cnn.train(x_train, y_train, x_test, y_test)
+    return history
+
+
+
+
+# Starts the training and evaluation of feed forward neural network on MNIST dataset mixed with GAN images
+def run_ffn_with_GAN_data():
+    ffn = FFN()
+    (x_train, y_train), (x_test, y_test) = load_mixed_data_flat()
+    history = ffn.train(x_train, y_train, x_test, y_test)
     return history
 
 
@@ -66,11 +74,21 @@ def run_cnn_with_GAN_data():
 
 
 # Starts the training on GAN dataset and evaluate on MNIST
+def run_ffn_only_on_GAN_data():
+    ffn = FFN()
+    (x_train, y_train), (x_test, y_test) = load_gan_train_mnist_val_data_flat()
+    history = ffn.train(x_train, y_train, x_test, y_test)
+    return history
+
+
+# Starts the training on GAN dataset and evaluate on MNIST
 def run_cnn_only_on_GAN_data():
     cnn = CNN()
     (x_train, y_train), (x_test, y_test) = load_gan_train_mnist_val_data()
     history = cnn.train(x_train, y_train, x_test, y_test)
     return history
+
+
 
 
 def visualize_history(history, eval_sc,  name, res_dir):
@@ -100,6 +118,15 @@ def visualize_history(history, eval_sc,  name, res_dir):
             f.write("%s\n" % item)
 
 if __name__=="__main__":
+
+    hist, eval_sc = run_ffn()
+    visualize_history(hist, eval_sc, "ffn", "RESULTS/NOGANRES")
+
+    hist, eval_sc = run_ffn_with_GAN_data()
+    visualize_history(hist, eval_sc, "ffn_mixed", "RESULTS/MNISTANDGANRES")
+
+    hist, eval_sc = run_ffn_only_on_GAN_data()
+    visualize_history(hist, eval_sc, "ffn_gan", "RESULTS/GANRES")
 
     # CNNs
     hist, eval_sc = run_cnn()
