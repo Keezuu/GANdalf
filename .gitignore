@@ -8,3 +8,7 @@ models/
 *.png
 *.jpg
 GAN/data/*
+*.ckpt
+*.npy
+*/__pycache__/
+*/__init__.py
