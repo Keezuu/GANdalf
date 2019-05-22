@@ -27,7 +27,7 @@ It is trained on 10 k of MNIST images to simulate "small" dataset.
 
 Results of the last epoch:
 
-![alt text](https://github.com/Jkeezuz/MNIST_GAN/raw/master/src/GAN/samples/last_epoch.png "Logo Title Text 1")
+![alt text](https://github.com/Jkeezuz/MNIST_GAN/raw/master/GAN_RESULTS/GAN_SAMPLES/samples/last_epoch.png "Logo Title Text 1")
 
 ## Training results
 
