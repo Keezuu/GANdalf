@@ -37,7 +37,7 @@ class Network(ABC):
         # Save the weights in .h5 file
 
         if not os.path.exists(os.path.join(cnst.RES_DIR, cnst.MODELS_DIR)):
-            os.path.join(cnst.RES_DIR, cnst.MODELS_DIR)
+            os.makedirs(os.path.join(cnst.RES_DIR, cnst.MODELS_DIR))
 
         self.model.save_weights(os.path.join(cnst.RES_DIR, cnst.MODELS_DIR, date + "def" + ".h5"))
 

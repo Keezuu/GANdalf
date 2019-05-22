@@ -56,7 +56,7 @@ FloatTensor = torch.cuda.FloatTensor
 LongTensor = torch.cuda.LongTensor
 
 
-def sample_image(n_row, batches_done):
+def sample_image(n_row, epoch):
     """Saves a grid of generated digits ranging from 0 to n_classes"""
     # Sample noise
     z = Variable(FloatTensor(np.random.normal(0, 1, (n_row ** 2, cnst.GAN_LATENT_SIZE))))
@@ -64,7 +64,8 @@ def sample_image(n_row, batches_done):
     labels = np.array([num for _ in range(n_row) for num in range(n_row)])
     labels = Variable(LongTensor(labels))
     gen_imgs = G(z, labels)
-    save_image(gen_imgs.reshape(gen_imgs.shape[0], 1, gen_imgs.shape[1], gen_imgs.shape[2]).data, "samples/%d.png" % batches_done, nrow=n_row, normalize=True)
+    save_image(gen_imgs.reshape(gen_imgs.shape[0], 1, gen_imgs.shape[1], gen_imgs.shape[2]).data,
+               os.path.join(cnst.GAN_SAMPLES_DIR, epoch+".png"), nrow=n_row, normalize=True)
 
 
 def denorm(x):
@@ -152,7 +153,7 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
         images = imgs.view(imgs.size(0), 1, 28, 28)
         save_image(denorm(imgs.data), os.path.join(cnst.GAN_SAMPLES_DIR, 'real_images.png'))
     # Save sampled images
-    sample_image(n_row=10, batches_done=batches_done)
+    sample_image(n_row=10, epoch=epoch)
 
     # Save and plot Statistics
     np.save(os.path.join(cnst.GAN_SAVE_DIR, 'd_losses.npy'), d_losses)
@@ -171,15 +172,15 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
     plt.figure()
     pylab.xlim(0, cnst.GAN_NUM_EPOCHS + 1)
     pylab.ylim(0, 1)
-    plt.plot(range(1, cnst.GAN_NUM_EPOCHS + 1), fake_scores, label='fake score')
+    plt.plot(range(1, cnst.GAN_NUM_EPOCHS + 1), fake_scores, label='fake Escore')
     plt.plot(range(1, cnst.GAN_NUM_EPOCHS + 1), real_scores, label='real score')
     plt.legend()
     plt.savefig(os.path.join(cnst.GAN_SAVE_DIR, 'accuracy.pdf'))
     plt.close()
     # Save model at checkpoints
     if (epoch+1) % 50 == 0:
-        torch.save(G.state_dict(), os.path.join(cnst.GAN_SAVE_DIR, 'G--{}.ckpt'.format(epoch+1)))
-        torch.save(D.state_dict(), os.path.join(cnst.GAN_SAVE_DIR, 'D--{}.ckpt'.format(epoch+1)))
+        torch.save(G.state_dict(), os.path.join(cnst.GAN_MODEL_DIR, 'G--{}.ckpt'.format(epoch+1)))
+        torch.save(D.state_dict(), os.path.join(cnst.GAN_MODEL_DIR, 'D--{}.ckpt'.format(epoch+1)))
 
 # Save the model checkpoints
 torch.save(G.state_dict(), 'G.ckpt')
