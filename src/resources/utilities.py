@@ -29,7 +29,7 @@ def denorm(x):
     out = (x + 1) / 2
     return out.clamp(0, 1)
 
-def sample_image(G, n_row, epoch):
+def sample_image(G, n_row, name):
     """Saves a grid of generated digits ranging from 0 to n_classes"""
     # Sample noise
     z = Variable(torch.cuda.FloatTensor(np.random.normal(0, 1, (n_row ** 2, cnst.GAN_LATENT_SIZE))))
@@ -38,7 +38,7 @@ def sample_image(G, n_row, epoch):
     labels = Variable(torch.cuda.LongTensor(labels))
     gen_imgs = G(z, labels)
     save_image(gen_imgs.reshape(gen_imgs.shape[0], 1, gen_imgs.shape[1], gen_imgs.shape[2]).data,
-               os.path.join(cnst.GAN_SAMPLES_DIR, "img",  str(epoch)+".png"), nrow=n_row, normalize=True)
+               os.path.join(cnst.GAN_SAMPLES_DIR, "img",  name+".png"), nrow=n_row, normalize=True)
 
 def check_for_gpu():
     # Make sure that we're using gpu

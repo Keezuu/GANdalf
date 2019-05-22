@@ -143,7 +143,7 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
         save_image(denorm(imgs.data), os.path.join(cnst.GAN_SAMPLES_DIR, 'real_images.png'))
     # Save sampled images
     if epoch % 5 == 0:
-        sample_image(G, n_row=10, epoch=epoch)
+        sample_image(G, n_row=10, name=str(epoch).zfill(cnst.GAN_NUM_EPOCHS))
 
     # Save and plot Statistics
     np.save(os.path.join(cnst.GAN_SAVE_DIR, 'd_losses.npy'), d_losses)
@@ -178,8 +178,7 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
 torch.save(G.state_dict(), 'G.ckpt')
 torch.save(D.state_dict(), 'D.ckpt')
 
-# Rename files and generate gif
-fill_filenames_with_zeros(len(str(cnst.GAN_NUM_EPOCHS)))
+# generate gif
 filenames = os.listdir(os.path.join(cnst.GAN_SAMPLES_DIR, "img"))
 generate_gif(filenames)
 
