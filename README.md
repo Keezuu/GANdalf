@@ -33,8 +33,8 @@ Results of the last epoch:
 
 Accuracy throughout the training
 
-![alt text](https://github.com/Jkeezuz/MNIST_GAN/raw/master/src/GAN/save/accuracy.png "Logo Title Text 1")
+![alt text](https://github.com/Jkeezuz/MNIST_GAN/raw/master/GAN_RESULTS/GAN_SAVES/save/accuracy.png  "Logo Title Text 1")
 
 Loss throughout the training
 
-![alt text](https://github.com/Jkeezuz/MNIST_GAN/raw/master/src/GAN/save/loss.png "Logo Title Text 1")
+![alt text](https://github.com/Jkeezuz/MNIST_GAN/raw/master/GAN_RESULTS/GAN_SAVES/save/loss.png  "Logo Title Text 1")
