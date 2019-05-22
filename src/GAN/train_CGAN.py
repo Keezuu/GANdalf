@@ -15,23 +15,8 @@ from torchvision.transforms import transforms
 from src.GAN.Discriminator import Discriminator
 from src.GAN.Generator import Generator
 import src.resources.constants as cnst
+from src.resources.utilities import sample_image, denorm
 
-
-def sample_image(n_row, epoch):
-    """Saves a grid of generated digits ranging from 0 to n_classes"""
-    # Sample noise
-    z = Variable(FloatTensor(np.random.normal(0, 1, (n_row ** 2, cnst.GAN_LATENT_SIZE))))
-    # Get labels ranging from 0 to n_classes for n rows
-    labels = np.array([num for _ in range(n_row) for num in range(n_row)])
-    labels = Variable(LongTensor(labels))
-    gen_imgs = G(z, labels)
-    save_image(gen_imgs.reshape(gen_imgs.shape[0], 1, gen_imgs.shape[1], gen_imgs.shape[2]).data,
-               os.path.join(cnst.GAN_SAMPLES_DIR, str(epoch)+".png"), nrow=n_row, normalize=True)
-
-
-def denorm(x):
-    out = (x + 1) / 2
-    return out.clamp(0, 1)
 
 # Create directories if they don't exist
 if not os.path.exists(cnst.GAN_SAMPLES_DIR):
@@ -150,14 +135,13 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
 
         batches_done = epoch * len(data_loader) + i
 
-    #torch.save(G, os.path.join(save_dir, 'generative_model'+str(epoch)+".pth"))
-    #torch.save(D, os.path.join(save_dir, 'discriminative_model'+str(epoch)+".pth"))
     # Save real images
     if (epoch + 1) == 1:
         images = imgs.view(imgs.size(0), 1, 28, 28)
         save_image(denorm(imgs.data), os.path.join(cnst.GAN_SAMPLES_DIR, 'real_images.png'))
     # Save sampled images
-    sample_image(n_row=10, epoch=epoch)
+    if epoch % 5 == 0:
+        sample_image(G, n_row=10, epoch=epoch)
 
     # Save and plot Statistics
     np.save(os.path.join(cnst.GAN_SAVE_DIR, 'd_losses.npy'), d_losses)
@@ -170,7 +154,7 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
     plt.plot(range(1, cnst.GAN_NUM_EPOCHS + 1), d_losses, label='d loss')
     plt.plot(range(1, cnst.GAN_NUM_EPOCHS + 1), g_losses, label='g loss')
     plt.legend()
-    plt.savefig(os.path.join(cnst.GAN_SAVE_DIR, 'loss.pdf'))
+    plt.savefig(os.path.join(cnst.GAN_SAVE_DIR, 'loss.png'))
     plt.close()
 
     plt.figure()
@@ -179,10 +163,12 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
     plt.plot(range(1, cnst.GAN_NUM_EPOCHS + 1), fake_scores, label='fake Escore')
     plt.plot(range(1, cnst.GAN_NUM_EPOCHS + 1), real_scores, label='real score')
     plt.legend()
-    plt.savefig(os.path.join(cnst.GAN_SAVE_DIR, 'accuracy.pdf'))
+    plt.savefig(os.path.join(cnst.GAN_SAVE_DIR, 'accuracy.png'))
     plt.close()
     # Save model at checkpoints
     if (epoch+1) % 50 == 0:
+        if not os.path.exists(cnst.GAN_MODEL_DIR):
+            os.makedirs(cnst.GAN_MODEL_DIR)
         torch.save(G.state_dict(), os.path.join(cnst.GAN_MODEL_DIR, 'G--{}.ckpt'.format(epoch+1)))
         torch.save(D.state_dict(), os.path.join(cnst.GAN_MODEL_DIR, 'D--{}.ckpt'.format(epoch+1)))
 
