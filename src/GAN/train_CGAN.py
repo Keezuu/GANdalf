@@ -17,6 +17,22 @@ from src.GAN.Generator import Generator
 import src.resources.constants as cnst
 
 
+def sample_image(n_row, epoch):
+    """Saves a grid of generated digits ranging from 0 to n_classes"""
+    # Sample noise
+    z = Variable(FloatTensor(np.random.normal(0, 1, (n_row ** 2, cnst.GAN_LATENT_SIZE))))
+    # Get labels ranging from 0 to n_classes for n rows
+    labels = np.array([num for _ in range(n_row) for num in range(n_row)])
+    labels = Variable(LongTensor(labels))
+    gen_imgs = G(z, labels)
+    save_image(gen_imgs.reshape(gen_imgs.shape[0], 1, gen_imgs.shape[1], gen_imgs.shape[2]).data,
+               os.path.join(cnst.GAN_SAMPLES_DIR, str(epoch)+".png"), nrow=n_row, normalize=True)
+
+
+def denorm(x):
+    out = (x + 1) / 2
+    return out.clamp(0, 1)
+
 # Create directories if they don't exist
 if not os.path.exists(cnst.GAN_SAMPLES_DIR):
     os.makedirs(cnst.GAN_SAMPLES_DIR)
@@ -59,21 +75,6 @@ FloatTensor = torch.cuda.FloatTensor
 LongTensor = torch.cuda.LongTensor
 
 
-def sample_image(n_row, epoch):
-    """Saves a grid of generated digits ranging from 0 to n_classes"""
-    # Sample noise
-    z = Variable(FloatTensor(np.random.normal(0, 1, (n_row ** 2, cnst.GAN_LATENT_SIZE))))
-    # Get labels ranging from 0 to n_classes for n rows
-    labels = np.array([num for _ in range(n_row) for num in range(n_row)])
-    labels = Variable(LongTensor(labels))
-    gen_imgs = G(z, labels)
-    save_image(gen_imgs.reshape(gen_imgs.shape[0], 1, gen_imgs.shape[1], gen_imgs.shape[2]).data,
-               os.path.join(cnst.GAN_SAMPLES_DIR, str(epoch)+".png"), nrow=n_row, normalize=True)
-
-
-def denorm(x):
-    out = (x + 1) / 2
-    return out.clamp(0, 1)
 
 # Statistics to be saved
 d_losses = np.zeros(cnst.GAN_NUM_EPOCHS)
@@ -142,7 +143,7 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
         real_scores[epoch] = real_scores[epoch] * (i / (i + 1.)) + real_score.mean().data * (1. / (i + 1.))
         fake_scores[epoch] = fake_scores[epoch] * (i / (i + 1.)) + fake_score.mean().data * (1. / (i + 1.))
 
-        if (i + 1) % 20 == 0:
+        if i % 4 == 0:
             print('Epoch [{}/{}], Step [{}/{}], d_loss: {:.4f}, g_loss: {:.4f}, D(x): {:.2f}, D(G(z)): {:.2f}'
                   .format(epoch, cnst.GAN_NUM_EPOCHS, i + 1, total_step, d_loss.data, g_loss.data,
                           real_score.mean().data, fake_score.mean().data))
