@@ -27,14 +27,14 @@ It is trained on 10 k of MNIST images to simulate "small" dataset.
 
 Results of the last epoch:
 
-![alt text](https://github.com/Jkeezuz/MNIST_GAN/raw/master/GAN/samples/last_epoch.png "Logo Title Text 1")
+![alt text](https://github.com/Jkeezuz/MNIST_GAN/raw/master/src/GAN/samples/last_epoch.png "Logo Title Text 1")
 
 ## Training results
 
 Accuracy throughout the training
 
-![alt text](https://github.com/Jkeezuz/MNIST_GAN/raw/master/GAN/save/accuracy.png "Logo Title Text 1")
+![alt text](https://github.com/Jkeezuz/MNIST_GAN/raw/master/src/GAN/save/accuracy.png "Logo Title Text 1")
 
 Loss throughout the training
 
-![alt text](https://github.com/Jkeezuz/MNIST_GAN/raw/master/GAN/save/loss.png "Logo Title Text 1")
+![alt text](https://github.com/Jkeezuz/MNIST_GAN/raw/master/src/GAN/save/loss.png "Logo Title Text 1")
