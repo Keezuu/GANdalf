@@ -1,11 +1,29 @@
 import datetime
-import os
-
-import numpy as np
 import pandas as pd
 import src.resources.constants as cnst
-import tensorflow as tf
 import keras.utils
+import os
+from torchvision.utils import save_image
+from torch.autograd import Variable
+import torch
+
+import numpy as np
+
+
+def denorm(x):
+    out = (x + 1) / 2
+    return out.clamp(0, 1)
+
+def sample_image(G, n_row, epoch):
+    """Saves a grid of generated digits ranging from 0 to n_classes"""
+    # Sample noise
+    z = Variable(torch.cuda.FloatTensor(np.random.normal(0, 1, (n_row ** 2, cnst.GAN_LATENT_SIZE))))
+    # Get labels ranging from 0 to n_classes for n rows
+    labels = np.array([num for _ in range(n_row) for num in range(n_row)])
+    labels = Variable(torch.cuda.LongTensor(labels))
+    gen_imgs = G(z, labels)
+    save_image(gen_imgs.reshape(gen_imgs.shape[0], 1, gen_imgs.shape[1], gen_imgs.shape[2]).data,
+               os.path.join(cnst.GAN_SAMPLES_DIR, "img",  str(epoch)+".png"), nrow=n_row, normalize=True)
 
 def check_for_gpu():
     # Make sure that we're using gpu
