@@ -15,7 +15,7 @@ from torchvision.transforms import transforms
 from src.GAN.Discriminator import Discriminator
 from src.GAN.Generator import Generator
 import src.resources.constants as cnst
-from src.resources.utilities import sample_image, denorm, generate_gif, fill_filenames_with_zeros
+from src.resources.utilities import sample_image, denorm, generate_gif, save_statistics
 
 
 # Create directories if they don't exist
@@ -60,8 +60,6 @@ D_opt = torch.optim.Adam(D.parameters(), lr=0.0002)
 
 FloatTensor = torch.cuda.FloatTensor
 LongTensor = torch.cuda.LongTensor
-
-
 
 # Statistics to be saved
 d_losses = np.zeros(cnst.GAN_NUM_EPOCHS)
@@ -146,27 +144,8 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
         sample_image(G, n_row=10, name=str(epoch).zfill(cnst.GAN_NUM_EPOCHS))
 
     # Save and plot Statistics
-    np.save(os.path.join(cnst.GAN_SAVE_DIR, 'd_losses.npy'), d_losses)
-    np.save(os.path.join(cnst.GAN_SAVE_DIR, 'g_losses.npy'), g_losses)
-    np.save(os.path.join(cnst.GAN_SAVE_DIR, 'fake_scores.npy'), fake_scores)
-    np.save(os.path.join(cnst.GAN_SAVE_DIR, 'real_scores.npy'), real_scores)
+    save_statistics(d_losses, g_losses, fake_scores, real_scores)
 
-    plt.figure()
-    pylab.xlim(0, cnst.GAN_NUM_EPOCHS + 1)
-    plt.plot(range(1, cnst.GAN_NUM_EPOCHS + 1), d_losses, label='d loss')
-    plt.plot(range(1, cnst.GAN_NUM_EPOCHS + 1), g_losses, label='g loss')
-    plt.legend()
-    plt.savefig(os.path.join(cnst.GAN_SAVE_DIR, 'loss.png'))
-    plt.close()
-
-    plt.figure()
-    pylab.xlim(0, cnst.GAN_NUM_EPOCHS + 1)
-    pylab.ylim(0, 1)
-    plt.plot(range(1, cnst.GAN_NUM_EPOCHS + 1), fake_scores, label='fake Escore')
-    plt.plot(range(1, cnst.GAN_NUM_EPOCHS + 1), real_scores, label='real score')
-    plt.legend()
-    plt.savefig(os.path.join(cnst.GAN_SAVE_DIR, 'accuracy.png'))
-    plt.close()
     # Save model at checkpoints
     if (epoch+1) % 50 == 0:
         if not os.path.exists(cnst.GAN_MODEL_DIR):

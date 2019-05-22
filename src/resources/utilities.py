@@ -1,5 +1,7 @@
 import datetime
 import pandas as pd
+from matplotlib import pylab
+
 import src.resources.constants as cnst
 import keras.utils
 import os
@@ -7,8 +9,32 @@ from torchvision.utils import save_image
 from torch.autograd import Variable
 import torch
 import imageio
+import matplotlib.pyplot as plt
 
 import numpy as np
+
+def save_statistics(d_losses, g_losses, fake_scores, real_scores):
+    np.save(os.path.join(cnst.GAN_SAVE_DIR, 'd_losses.npy'), d_losses)
+    np.save(os.path.join(cnst.GAN_SAVE_DIR, 'g_losses.npy'), g_losses)
+    np.save(os.path.join(cnst.GAN_SAVE_DIR, 'fake_scores.npy'), fake_scores)
+    np.save(os.path.join(cnst.GAN_SAVE_DIR, 'real_scores.npy'), real_scores)
+
+    plt.figure()
+    pylab.xlim(0, cnst.GAN_NUM_EPOCHS + 1)
+    plt.plot(range(1, cnst.GAN_NUM_EPOCHS + 1), d_losses, label='d loss')
+    plt.plot(range(1, cnst.GAN_NUM_EPOCHS + 1), g_losses, label='g loss')
+    plt.legend()
+    plt.savefig(os.path.join(cnst.GAN_SAVE_DIR, 'loss.png'))
+    plt.close()
+
+    plt.figure()
+    pylab.xlim(0, cnst.GAN_NUM_EPOCHS + 1)
+    pylab.ylim(0, 1)
+    plt.plot(range(1, cnst.GAN_NUM_EPOCHS + 1), fake_scores, label='fake Escore')
+    plt.plot(range(1, cnst.GAN_NUM_EPOCHS + 1), real_scores, label='real score')
+    plt.legend()
+    plt.savefig(os.path.join(cnst.GAN_SAVE_DIR, 'accuracy.png'))
+    plt.close()
 
 def fill_filenames_with_zeros(width):
     filenames = os.listdir(os.path.join(cnst.GAN_SAMPLES_DIR, "img"))
