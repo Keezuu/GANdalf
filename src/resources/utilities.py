@@ -45,10 +45,7 @@ def save_predictions(predictions, filenames, result_name):
 
 
 def load_data(imgs_amount, val_split):
-    # MI TO NIE DZIALA WIEC UZYWAM PODEJSCIA 2, SPRAWDZCIE BO MOZE WAM BEDZIE DZIALAC
-    # (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
 
-    # 2:
     # Load data
     import gzip
     import sys
