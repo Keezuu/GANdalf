@@ -35,6 +35,10 @@ class Network(ABC):
         # Get current date and time for easier identyfication of models
         date = datetime.datetime.now().strftime("%m%d%H%M")
         # Save the weights in .h5 file
+
+        if not os.path.exists(os.path.join(cnst.RES_DIR, cnst.MODELS_DIR)):
+            os.path.join(cnst.RES_DIR, cnst.MODELS_DIR)
+
         self.model.save_weights(os.path.join(cnst.RES_DIR, cnst.MODELS_DIR, date + "def" + ".h5"))
 
         # Evaluates how good does our network work on test images

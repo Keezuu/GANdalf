@@ -12,3 +12,4 @@ GAN/data/*
 *.npy
 */__pycache__/
 */__init__.py
+*.7z
