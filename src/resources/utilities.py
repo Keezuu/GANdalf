@@ -6,9 +6,24 @@ import os
 from torchvision.utils import save_image
 from torch.autograd import Variable
 import torch
+import imageio
 
 import numpy as np
 
+def fill_filenames_with_zeros(width):
+    filenames = os.listdir(os.path.join(cnst.GAN_SAMPLES_DIR, "img"))
+    for filename in filenames:
+        filename_stripped = filename.strip('.png')
+        filename_filled = filename_stripped.zfill(width)
+        filename_filled += ".png"
+        os.rename(os.path.join(cnst.GAN_SAMPLES_DIR, "img", filename),
+                  os.path.join(cnst.GAN_SAMPLES_DIR, "img", filename_filled))
+
+def generate_gif(filenames):
+    with imageio.get_writer(os.path.join(cnst.GAN_SAMPLES_DIR, "resultgif.gif"), mode='I', duration=0.5) as writer:
+        for filename in filenames:
+            image = imageio.imread(os.path.join(cnst.GAN_SAMPLES_DIR, "img", filename))
+            writer.append_data(image)
 
 def denorm(x):
     out = (x + 1) / 2

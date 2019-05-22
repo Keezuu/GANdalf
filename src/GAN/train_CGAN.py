@@ -15,7 +15,7 @@ from torchvision.transforms import transforms
 from src.GAN.Discriminator import Discriminator
 from src.GAN.Generator import Generator
 import src.resources.constants as cnst
-from src.resources.utilities import sample_image, denorm
+from src.resources.utilities import sample_image, denorm, generate_gif, fill_filenames_with_zeros
 
 
 # Create directories if they don't exist
@@ -36,6 +36,8 @@ mnist = torchvision.datasets.MNIST(root=cnst.DATA_DIR,
                                    train=True,
                                    transform=transform,
                                    download=True)
+
+# Get only a part of the data
 subset_indices = [x for x in range (cnst.GAN_MNIST_TRAINING_SIZE)]
 mnist = torch.utils.data.Subset(mnist, subset_indices)
 # Create data loader with shuffling allowed
@@ -175,3 +177,9 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
 # Save the model checkpoints
 torch.save(G.state_dict(), 'G.ckpt')
 torch.save(D.state_dict(), 'D.ckpt')
+
+# Rename files and generate gif
+fill_filenames_with_zeros(len(str(cnst.GAN_NUM_EPOCHS)))
+filenames = os.listdir(os.path.join(cnst.GAN_SAMPLES_DIR, "img"))
+generate_gif(filenames)
+
