@@ -9,12 +9,13 @@ import numpy as np
 import sklearn.utils
 
 def load_mixed_data():
-    (x_train, y_train), (x_test, y_test) = utils.load_data(cnst.IMGS_AMOUNT, cnst.VAL_SPLIT)
-    (xg_train, yg_train), (xg_test, yg_test) = utils.load_GAN_data(cnst.IMGS_AMOUNT, cnst.VAL_SPLIT)
+    (x_train, y_train), (x_test, y_test) = utils.load_data(cnst.IMGS_AMOUNT + 3000, 0.3)
+    # We only want to load train images
+    (xg_train, yg_train), (xg_test, yg_test) = utils.load_GAN_data(cnst.IMGS_AMOUNT, 0)
     x_train = np.concatenate((x_train, xg_train))
     y_train = np.concatenate((y_train, yg_train))
-    x_test = np.concatenate((x_test, xg_test))
-    y_test = np.concatenate((y_test, yg_test))
+   # x_test = np.concatenate((x_test, xg_test))
+    #y_test = np.concatenate((y_test, yg_test))
     # Shuffling data
     sklearn.utils.shuffle(x_train, y_train)
     sklearn.utils.shuffle(x_test, y_test)
@@ -23,11 +24,11 @@ def load_mixed_data():
 
 def load_mixed_data_flat():
     (x_train, y_train), (x_test, y_test) = utils.load_data_flat(cnst.IMGS_AMOUNT, cnst.VAL_SPLIT)
-    (xg_train, yg_train), (xg_test, yg_test) = utils.load_GAN_data_flat(cnst.IMGS_AMOUNT, cnst.VAL_SPLIT)
+    (xg_train, yg_train), (xg_test, yg_test) = utils.load_GAN_data_flat(cnst.IMGS_AMOUNT, 0)
     x_train = np.concatenate((x_train, xg_train))
     y_train = np.concatenate((y_train, yg_train))
-    x_test = np.concatenate((x_test, xg_test))
-    y_test = np.concatenate((y_test, yg_test))
+   # x_test = np.concatenate((x_test, xg_test))
+    #y_test = np.concatenate((y_test, yg_test))
     # Shuffling data
     sklearn.utils.shuffle(x_train, y_train)
     sklearn.utils.shuffle(x_test, y_test)
@@ -100,11 +101,11 @@ def visualize_history(history, eval_sc,  name, res_dir):
 if __name__=="__main__":
 
     # CNNs
-    hist, eval_sc = run_cnn()
-    visualize_history(hist, eval_sc, "cnn", os.path.join(cnst.RES_DIR, "ONLY_MNIST"))
+   # hist, eval_sc = run_cnn()
+  #  visualize_history(hist, eval_sc, "cnn", os.path.join(cnst.RES_DIR, "ONLY_MNIST"))
 
     hist, eval_sc = run_cnn_with_gan_data()
     visualize_history(hist, eval_sc, "cnn_mixed", os.path.join(cnst.RES_DIR, "MIXED"))
 
-    hist, eval_sc = run_cnn_only_on_gan_data()
-    visualize_history(hist, eval_sc, "cnn_gan", os.path.join(cnst.RES_DIR, "ONLY_GAN"))
+  #  hist, eval_sc = run_cnn_only_on_gan_data()
+  #  visualize_history(hist, eval_sc, "cnn_gan", os.path.join(cnst.RES_DIR, "ONLY_GAN"))

@@ -121,25 +121,32 @@ def load_data(imgs_amount, val_split):
     (x_train, y_train), (x_test, y_test) = data
 
     # Pick only imgs_amount of images
-    x_train = x_train[:imgs_amount - int(imgs_amount*val_split)]
-    y_train = y_train[:imgs_amount - int(imgs_amount*val_split)]
-    x_test = x_test[:int(imgs_amount*val_split)]
-    y_test = y_test[:int(imgs_amount*val_split)]
+    if val_split == 0:
+        x_train = x_train[:imgs_amount]
+        y_train = y_train[:imgs_amount]
+        x_test = None
+        y_test = None
+    else:
+        x_train = x_train[:imgs_amount - int(imgs_amount * val_split)]
+        y_train = y_train[:imgs_amount - int(imgs_amount * val_split)]
+        x_test = x_test[:int(imgs_amount * val_split)]
+        y_test = y_test[:int(imgs_amount * val_split)]
+
+        x_test = x_test.reshape(x_test.shape[0], 28, 28, 1)
+        x_test = x_test.astype('float32')
+        x_test /= 255
+        y_test = keras.utils.to_categorical(y_test)
 
     x_train = x_train.reshape(x_train.shape[0], 28, 28, 1)
-    x_test = x_test.reshape(x_test.shape[0], 28, 28, 1)
 
     # Making sure that the values are float so that we can get decimal points after division
     x_train = x_train.astype('float32')
-    x_test = x_test.astype('float32')
+
     # Normalizing the RGB codes by dividing it to the max RGB value.
     x_train /= 255
-    x_test /= 255
 
     # Convert labels to one-hot encoding
-
     y_train = keras.utils.to_categorical(y_train)
-    y_test = keras.utils.to_categorical(y_test)
 
     return (x_train, y_train), (x_test, y_test)
 
@@ -168,24 +175,34 @@ def load_GAN_data(imgs_amount, val_split):
     labels = np.load(os.path.join(cnst.GAN_DIR, "gan_labels.npy"))
 
     # Pick only imgs_amount of images
-    x_train = data[:imgs_amount - int(imgs_amount*val_split)]
-    y_train = labels[:imgs_amount - int(imgs_amount*val_split)]
-    x_test = data[:int(imgs_amount*val_split)]
-    y_test = labels[:int(imgs_amount*val_split)]
+    if val_split == 0:
+        x_train = data[:imgs_amount]
+        y_train = labels[:imgs_amount]
+        x_test = None
+        y_test = None
+    else:
+        x_train = data[:imgs_amount - int(imgs_amount*val_split)]
+        y_train = labels[:imgs_amount - int(imgs_amount*val_split)]
+        x_test = data[:int(imgs_amount*val_split)]
+        y_test = labels[:int(imgs_amount*val_split)]
+
+        x_test = x_test.reshape(x_test.shape[0], 28, 28, 1)
+        x_test = x_test.astype('float32')
+        x_test /= 255
+        y_test = keras.utils.to_categorical(y_test)
 
     x_train = x_train.reshape(x_train.shape[0], 28, 28, 1)
-    x_test = x_test.reshape(x_test.shape[0], 28, 28, 1)
+
 
     # Making sure that the values are float so that we can get decimal points after division
     x_train = x_train.astype('float32')
-    x_test = x_test.astype('float32')
+
     # Normalizing the RGB codes by dividing it to the max RGB value.
     x_train /= 255
-    x_test /= 255
+
 
     # Convert labels to one-hot encoding
-
     y_train = keras.utils.to_categorical(y_train)
-    y_test = keras.utils.to_categorical(y_test)
+
 
     return (x_train, y_train), (x_test, y_test)
