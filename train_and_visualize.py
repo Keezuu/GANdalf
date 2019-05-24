@@ -1,3 +1,4 @@
+import datetime
 import os
 
 from src.network.FFN import FFN
@@ -73,6 +74,9 @@ def run_cnn_only_on_gan_data():
 
 def visualize_history(history, eval_sc,  name, res_dir):
 
+    date = datetime.datetime.now().strftime("%m%d%H%M")
+    if not os.path.exists(os.path.join(res_dir, date, name)):
+        os.makedirs(os.path.join(res_dir, date, name))
     # summarize history for accuracy
     plt.plot(history.history['acc'])
     plt.plot(history.history['val_acc'])
@@ -80,7 +84,7 @@ def visualize_history(history, eval_sc,  name, res_dir):
     plt.ylabel('accuracy')
     plt.xlabel('epoch')
     plt.legend(['train', 'test'], loc='upper left')
-    plt.savefig(os.path.join(res_dir, name+'netacc.png'))
+    plt.savefig(os.path.join(res_dir, date,  name, 'netacc.png'))
     plt.show()
 
 
@@ -91,10 +95,10 @@ def visualize_history(history, eval_sc,  name, res_dir):
     plt.ylabel('loss')
     plt.xlabel('epoch')
     plt.legend(['train', 'test'], loc='upper left')
-    plt.savefig(os.path.join(res_dir, name+'netloss.png'))
+    plt.savefig(os.path.join(res_dir, date, name, 'netloss.png'))
     plt.show()
 
-    with open(os.path.join(res_dir, name + 'eval.txt'), "w+") as f:
+    with open(os.path.join(res_dir, date, name, 'eval.txt'), "w+") as f:
         for item in eval_sc:
             f.write("%s\n" % item)
 
@@ -105,6 +109,7 @@ if __name__=="__main__":
   #  visualize_history(hist, eval_sc, "cnn", os.path.join(cnst.RES_DIR, "ONLY_MNIST"))
 
     hist, eval_sc = run_cnn_with_gan_data()
+
     visualize_history(hist, eval_sc, "cnn_mixed", os.path.join(cnst.RES_DIR, "MIXED"))
 
   #  hist, eval_sc = run_cnn_only_on_gan_data()
