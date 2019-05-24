@@ -1,3 +1,4 @@
+import datetime
 import os
 import torch
 import torchvision
@@ -24,7 +25,8 @@ if not os.path.exists(cnst.GAN_SAMPLES_DIR):
 
 if not os.path.exists(cnst.GAN_SAVE_DIR):
     os.makedirs(cnst.GAN_SAVE_DIR)
-
+#Get current date for naming folders
+date = datetime.datetime.now().strftime("%m%d%H%M")
 # Image processing
 transform = transforms.Compose([
     transforms.ToTensor(),
@@ -135,29 +137,38 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
 
         batches_done = epoch * len(data_loader) + i
 
+
+
+    #Create save folder
+
+    if not os.path.exists(os.path.join(cnst.GAN_SAVE_DIR, date)):
+        os.makedirs(os.path.join(cnst.GAN_SAVE_DIR, date))
+    if not os.path.exists(os.path.join(cnst.GAN_SAMPLES_DIR, date)):
+        os.makedirs(os.path.join(cnst.GAN_SAMPLES_DIR, date))
+    if not os.path.exists(os.path.join(cnst.GAN_MODEL_DIR, date)):
+        os.makedirs(os.path.join(cnst.GAN_MODEL_DIR, date))
+
     # Save real images
     if (epoch + 1) == 1:
         images = imgs.view(imgs.size(0), 1, 28, 28)
-        save_image(denorm(imgs.data), os.path.join(cnst.GAN_SAMPLES_DIR, 'real_images.png'))
+        save_image(denorm(imgs.data), os.path.join(cnst.GAN_SAMPLES_DIR, date,  'real_images.png'))
     # Save sampled images
     if epoch % 5 == 0:
-        sample_image(G, n_row=10, name=str(epoch).zfill(cnst.GAN_NUM_EPOCHS))
+        sample_image(G, n_row=10, name=str(epoch).zfill(len(str(cnst.GAN_NUM_EPOCHS))))
 
     # Save and plot Statistics
     save_statistics(d_losses, g_losses, fake_scores, real_scores)
 
     # Save model at checkpoints
     if (epoch+1) % 50 == 0:
-        if not os.path.exists(cnst.GAN_MODEL_DIR):
-            os.makedirs(cnst.GAN_MODEL_DIR)
-        torch.save(G.state_dict(), os.path.join(cnst.GAN_MODEL_DIR, 'G--{}.ckpt'.format(epoch+1)))
-        torch.save(D.state_dict(), os.path.join(cnst.GAN_MODEL_DIR, 'D--{}.ckpt'.format(epoch+1)))
+        torch.save(G.state_dict(), os.path.join(cnst.GAN_MODEL_DIR, date, 'G--{}.ckpt'.format(epoch+1)))
+        torch.save(D.state_dict(), os.path.join(cnst.GAN_MODEL_DIR, date, 'D--{}.ckpt'.format(epoch+1)))
 
 # Save the model checkpoints
 torch.save(G.state_dict(), 'G.ckpt')
 torch.save(D.state_dict(), 'D.ckpt')
 
 # generate gif
-filenames = os.listdir(os.path.join(cnst.GAN_SAMPLES_DIR, "img"))
+filenames = os.listdir(os.path.join(cnst.GAN_SAMPLES_DIR, date, "img"))
 generate_gif(filenames)
 
