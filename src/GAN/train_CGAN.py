@@ -26,7 +26,7 @@ if not os.path.exists(cnst.GAN_SAMPLES_DIR):
 if not os.path.exists(cnst.GAN_SAVE_DIR):
     os.makedirs(cnst.GAN_SAVE_DIR)
 #Get current date for naming folders
-date = datetime.datetime.now().strftime("%m%d%H%M")
+date = datetime.datetime.now().strftime("%m%d%H%M%S")
 # Image processing
 transform = transforms.Compose([
     transforms.ToTensor(),
@@ -154,10 +154,11 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
         save_image(denorm(imgs.data), os.path.join(cnst.GAN_SAMPLES_DIR, date,  'real_images.png'))
     # Save sampled images
     if epoch % 5 == 0:
-        sample_image(G, n_row=10, name=str(epoch).zfill(len(str(cnst.GAN_NUM_EPOCHS))))
+        sample_image(G, n_row=10, name=str(epoch).zfill(len(str(cnst.GAN_NUM_EPOCHS))),
+                     path=os.path.join(cnst.GAN_SAMPLES_DIR, date))
 
     # Save and plot Statistics
-    save_statistics(d_losses, g_losses, fake_scores, real_scores)
+    save_statistics(d_losses, g_losses, fake_scores, real_scores, os.path.join(cnst.GAN_SAVE_DIR, date))
 
     # Save model at checkpoints
     if (epoch+1) % 50 == 0:
@@ -170,5 +171,5 @@ torch.save(D.state_dict(), 'D.ckpt')
 
 # generate gif
 filenames = os.listdir(os.path.join(cnst.GAN_SAMPLES_DIR, date, "img"))
-generate_gif(filenames)
+generate_gif(filenames, save_path=os.path.join(cnst.GAN_SAVE_DIR, date), read_path=os.path.join(cnst.GAN_SAMPLES_DIR, date))
 

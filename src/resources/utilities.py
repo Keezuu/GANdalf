@@ -13,18 +13,18 @@ import matplotlib.pyplot as plt
 
 import numpy as np
 
-def save_statistics(d_losses, g_losses, fake_scores, real_scores):
-    np.save(os.path.join(cnst.GAN_SAVE_DIR, 'd_losses.npy'), d_losses)
-    np.save(os.path.join(cnst.GAN_SAVE_DIR, 'g_losses.npy'), g_losses)
-    np.save(os.path.join(cnst.GAN_SAVE_DIR, 'fake_scores.npy'), fake_scores)
-    np.save(os.path.join(cnst.GAN_SAVE_DIR, 'real_scores.npy'), real_scores)
+def save_statistics(d_losses, g_losses, fake_scores, real_scores, path):
+    np.save(os.path.join(path, 'd_losses.npy'), d_losses)
+    np.save(os.path.join(path, 'g_losses.npy'), g_losses)
+    np.save(os.path.join(path, 'fake_scores.npy'), fake_scores)
+    np.save(os.path.join(path, 'real_scores.npy'), real_scores)
 
     plt.figure()
     pylab.xlim(0, cnst.GAN_NUM_EPOCHS + 1)
     plt.plot(range(1, cnst.GAN_NUM_EPOCHS + 1), d_losses, label='d loss')
     plt.plot(range(1, cnst.GAN_NUM_EPOCHS + 1), g_losses, label='g loss')
     plt.legend()
-    plt.savefig(os.path.join(cnst.GAN_SAVE_DIR, 'loss.png'))
+    plt.savefig(os.path.join(path, 'loss.png'))
     plt.close()
 
     plt.figure()
@@ -33,7 +33,7 @@ def save_statistics(d_losses, g_losses, fake_scores, real_scores):
     plt.plot(range(1, cnst.GAN_NUM_EPOCHS + 1), fake_scores, label='fake Escore')
     plt.plot(range(1, cnst.GAN_NUM_EPOCHS + 1), real_scores, label='real score')
     plt.legend()
-    plt.savefig(os.path.join(cnst.GAN_SAVE_DIR, 'accuracy.png'))
+    plt.savefig(os.path.join(path, 'accuracy.png'))
     plt.close()
 
 def fill_filenames_with_zeros(width):
@@ -45,17 +45,17 @@ def fill_filenames_with_zeros(width):
         os.rename(os.path.join(cnst.GAN_SAMPLES_DIR, "img", filename),
                   os.path.join(cnst.GAN_SAMPLES_DIR, "img", filename_filled))
 
-def generate_gif(filenames):
-    with imageio.get_writer(os.path.join(cnst.GAN_SAMPLES_DIR, "resultgif.gif"), mode='I', duration=0.5) as writer:
+def generate_gif(filenames, save_path, read_path):
+    with imageio.get_writer(os.path.join(save_path, "resultgif.gif"), mode='I', duration=0.5) as writer:
         for filename in filenames:
-            image = imageio.imread(os.path.join(cnst.GAN_SAMPLES_DIR, "img", filename))
+            image = imageio.imread(os.path.join(read_path, "img", filename))
             writer.append_data(image)
 
 def denorm(x):
     out = (x + 1) / 2
     return out.clamp(0, 1)
 
-def sample_image(G, n_row, name):
+def sample_image(G, n_row, name, path):
     """Saves a grid of generated digits ranging from 0 to n_classes"""
     # Sample noise
     z = Variable(torch.cuda.FloatTensor(np.random.normal(0, 1, (n_row ** 2, cnst.GAN_LATENT_SIZE))))
@@ -63,8 +63,10 @@ def sample_image(G, n_row, name):
     labels = np.array([num for _ in range(n_row) for num in range(n_row)])
     labels = Variable(torch.cuda.LongTensor(labels))
     gen_imgs = G(z, labels)
+    if not os.path.exists(os.path.join(path, "img")):
+        os.makedirs(os.path.join(path, "img"))
     save_image(gen_imgs.reshape(gen_imgs.shape[0], 1, gen_imgs.shape[1], gen_imgs.shape[2]).data,
-               os.path.join(cnst.GAN_SAMPLES_DIR, "img",  name+".png"), nrow=n_row, normalize=True)
+               os.path.join(path, "img",  name+".png"), nrow=n_row, normalize=True)
 
 def check_for_gpu():
     # Make sure that we're using gpu

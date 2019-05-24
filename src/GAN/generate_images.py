@@ -32,9 +32,9 @@ labels = np.array([num for _ in range(1000) for num in range(n_class)])
 labels = Variable(LongTensor(labels))
 gen_imgs = G(z, labels)
 save_image(gen_imgs.reshape(gen_imgs.shape[0], 1, gen_imgs.shape[1], gen_imgs.shape[2]).data,
-           os.path.join(cnst.GAN_SAMPLES_DIR, "generatedVIS.png"), nrow=n_class, normalize=True)
+           os.path.join(cnst.GAN_SAMPLES_DIR, "generatedVIS3.png"), nrow=n_class, normalize=True)
 save_image(gen_imgs.reshape(gen_imgs.shape[0], 1, gen_imgs.shape[1], gen_imgs.shape[2]).data,
-           os.path.join(cnst.GAN_SAMPLES_DIR, "generatedVIS.png"), nrow=n_class*10, normalize=True)
+           os.path.join(cnst.GAN_SAMPLES_DIR, "generatedVIS4.png"), nrow=n_class*10, normalize=True)
 gen_imgs = gen_imgs.cpu().data.numpy()
 labels = labels.cpu().data.numpy()
 # Move the data to CPU and then copy it to numpy array
