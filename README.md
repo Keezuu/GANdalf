@@ -1,4 +1,5 @@
-# MNIST_GAN [WORK IN PROGRESS]
+# DataAugmentationWithGAN
+[WORK IN PROGRESS]
 A cGAN implementation for the MNIST dataset in PyTorch with convolutional and feed-forward neural network implementations in Keras.
 
 ## TODO: 
