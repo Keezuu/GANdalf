@@ -12,7 +12,7 @@ import sklearn.utils
 def load_mixed_data():
     (x_train, y_train), (x_test, y_test) = utils.load_data(cnst.IMGS_AMOUNT + 3000, 0.3)
     # We only want to load train images
-    (xg_train, yg_train), (xg_test, yg_test) = utils.load_GAN_data(cnst.IMGS_AMOUNT, 0)
+    (xg_train, yg_train), (xg_test, yg_test) = utils.load_GAN_data(10000, 0)
     x_train = np.concatenate((x_train, xg_train))
     y_train = np.concatenate((y_train, yg_train))
    # x_test = np.concatenate((x_test, xg_test))
@@ -51,7 +51,8 @@ def load_gan_train_mnist_val_data_flat():
 # Starts the training and evaluation of convolutional neural network on MNIST dataset
 def run_cnn():
     cnn = CNN()
-    (x_train, y_train), (x_test, y_test) = utils.load_data(cnst.IMGS_AMOUNT, cnst.VAL_SPLIT)
+    #(x_train, y_train), (x_test, y_test) = utils.load_data(cnst.IMGS_AMOUNT, cnst.VAL_SPLIT)
+    (x_train, y_train), (x_test, y_test) = utils.load_data(18000, 0.15)
     history = cnn.train(x_train, y_train, x_test, y_test)
     return history
 
@@ -105,12 +106,11 @@ def visualize_history(history, eval_sc,  name, res_dir):
 if __name__=="__main__":
 
     # CNNs
-   # hist, eval_sc = run_cnn()
-  #  visualize_history(hist, eval_sc, "cnn", os.path.join(cnst.RES_DIR, "ONLY_MNIST"))
+    hist, eval_sc = run_cnn()
+    visualize_history(hist, eval_sc, "cnn", os.path.join(cnst.RES_DIR, "ONLY_MNIST"))
 
-    hist, eval_sc = run_cnn_with_gan_data()
-
-    visualize_history(hist, eval_sc, "cnn_mixed", os.path.join(cnst.RES_DIR, "MIXED"))
+   # hist, eval_sc = run_cnn_with_gan_data()
+   # visualize_history(hist, eval_sc, "cnn_mixed", os.path.join(cnst.RES_DIR, "MIXED"))
 
   #  hist, eval_sc = run_cnn_only_on_gan_data()
   #  visualize_history(hist, eval_sc, "cnn_gan", os.path.join(cnst.RES_DIR, "ONLY_GAN"))
