@@ -1,5 +1,6 @@
-# MNIST_GAN [WORK IN PROGRESS]
-A cGAN implementation for the MNIST dataset in PyTorch with convolutional and feed-forward neural network implementations in Keras.
+# DataAugmentationWithGAN
+[WORK IN PROGRESS]
+A cGAN implementation for the MNIST dataset in PyTorch with convolutional neural network implementations in Keras.
 
 ## TODO: 
 a) Try to make the dataset even smaller (~1000 images) and optimize the GAN to achieve more impactful results.
