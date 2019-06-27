@@ -52,7 +52,7 @@ labels = np.zeros(10)
 #Check how many instances of each class there is
 for i in subset_indices:
     labels[mnist[i][-1]] += 1
-print("Labels: ")
+print("Number of image from given class: ")
 for idx, val in enumerate(labels):
     print(str(idx) + ": " + str(val))
 
