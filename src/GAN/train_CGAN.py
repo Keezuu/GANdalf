@@ -25,8 +25,11 @@ if not os.path.exists(cnst.GAN_SAMPLES_DIR):
 
 if not os.path.exists(cnst.GAN_SAVE_DIR):
     os.makedirs(cnst.GAN_SAVE_DIR)
-#Get current date for naming folders
+
+# Get current date for naming folders
+
 date = datetime.datetime.now().strftime("%m%d%H%M%S")
+
 # Image processing
 transform = transforms.Compose([
     transforms.ToTensor(),
@@ -42,8 +45,18 @@ mnist = torchvision.datasets.MNIST(root=cnst.DATA_DIR,
 # Get only a part of the data
 subset_indices = [x for x in range (cnst.GAN_MNIST_TRAINING_SIZE)]
 mnist = torch.utils.data.Subset(mnist, subset_indices)
-# Create data loader with shuffling allowed
 
+
+labels = np.zeros(10)
+
+#Check how many instances of each class there is
+for i in subset_indices:
+    labels[mnist[i][-1]] += 1
+print("Labels: ")
+for idx, val in enumerate(labels):
+    print(str(idx) + ": " + str(val))
+
+# Create data loader with shuffling allowed
 data_loader = torch.utils.data.DataLoader(dataset=mnist,
                                           batch_size=cnst.GAN_BATCH_SIZE,
                                           shuffle=True)
@@ -51,7 +64,7 @@ data_loader = torch.utils.data.DataLoader(dataset=mnist,
 # Create discriminator and generator and force them to use GPU
 D = Discriminator(img_shape=(28, 28), n_classes=10).cuda()
 
-G = Generator(img_shape=(28, 28), n_classes=10,latent_dim=cnst.GAN_LATENT_SIZE).cuda()
+G = Generator(img_shape=(28, 28), n_classes=10, latent_dim=cnst.GAN_LATENT_SIZE).cuda()
 
 # Create MSE loss function
 adv_loss = nn.MSELoss().cuda()
