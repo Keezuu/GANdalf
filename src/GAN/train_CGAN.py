@@ -47,24 +47,31 @@ subset_indices = [x for x in range (cnst.GAN_MNIST_TRAINING_SIZE)]
 mnist = torch.utils.data.Subset(mnist, subset_indices)
 
 
-labels = np.zeros(10)
+cnt_labels = np.zeros(10)
 
 #Check how many instances of each class there is
 for i in subset_indices:
-    labels[mnist[i][-1]] += 1
+    cnt_labels[mnist[i][-1]] += 1
 print("Number of image from given class: ")
-for idx, val in enumerate(labels):
+for idx, val in enumerate(cnt_labels):
     print(str(idx) + ": " + str(val))
 
 # Create data loader with shuffling allowed
 data_loader = torch.utils.data.DataLoader(dataset=mnist,
                                           batch_size=cnst.GAN_BATCH_SIZE,
                                           shuffle=True)
+FloatTensor = torch.cuda.FloatTensor
+LongTensor = torch.cuda.LongTensor
 
 # Create discriminator and generator and force them to use GPU
 D = Discriminator(img_shape=(28, 28), n_classes=10).cuda()
 
+# Sample of labels to train OneHotEncoder in generator
 G = Generator(img_shape=(28, 28), n_classes=10, latent_dim=cnst.GAN_LATENT_SIZE).cuda()
+# Train generator one-hot encoder
+one_hot_labels = np.arange(10)
+G.train_one_hot(Variable(LongTensor(one_hot_labels)))
+D.train_one_hot(Variable(LongTensor(one_hot_labels)))
 
 # Create MSE loss function
 adv_loss = nn.MSELoss().cuda()
@@ -73,8 +80,7 @@ adv_loss = nn.MSELoss().cuda()
 G_opt = torch.optim.Adam(G.parameters(), lr=0.0002)
 D_opt = torch.optim.Adam(D.parameters(), lr=0.0002)
 
-FloatTensor = torch.cuda.FloatTensor
-LongTensor = torch.cuda.LongTensor
+
 
 # Statistics to be saved
 d_losses = np.zeros(cnst.GAN_NUM_EPOCHS)

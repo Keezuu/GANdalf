@@ -6,7 +6,7 @@ from torchvision.utils import save_image
 from src.resources import constants as cnst
 from src.GAN.Generator import Generator
 import matplotlib.pyplot as plt
-
+from torch import nn
 
 
 # Create directories if they don't exist
@@ -24,7 +24,7 @@ LongTensor = torch.cuda.LongTensor
 G.load_state_dict(torch.load('G.ckpt'))
 
 n_class = 10
-# Generate 1000 images from class "i" and save them in npy file
+
 z = Variable(FloatTensor(np.random.normal(0, 1, (10000, cnst.GAN_LATENT_SIZE))))
 # Get labels ranging from 0 to n_classes for n rows
 labels = np.array([num for _ in range(1000) for num in range(n_class)])
@@ -44,7 +44,7 @@ np.save(file=os.path.join(cnst.GAN_DATA_DIR, "gan_labels.npy"), arr=labels)
 #visualize
 img_array = np.load(os.path.join(cnst.GAN_DATA_DIR, "gan_images.npy"))
 
-for i in range(10):
+for i in range(n_class):
     plt.title('Label is {label}'.format(label=i))
     plt.imshow(img_array[i], cmap='gray')
     plt.show()
