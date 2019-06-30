@@ -2,7 +2,7 @@
 venv/
 data/
 src/resources/__pycache__/
-*/__pycache__/
+*/__pycache__/*
 src/network/__pycache__/
 models/
 *.png
@@ -13,3 +13,6 @@ GAN/data/*
 */__pycache__/
 */__init__.py
 *.7z
+
+ALL_RESULTS/*
+GAN_RESULTS/*
