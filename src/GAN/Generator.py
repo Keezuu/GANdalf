@@ -1,13 +1,14 @@
 from fastai.imports import torch
 from torch import nn
 import numpy as np
-
+from sklearn.preprocessing import OneHotEncoder
+from torch.autograd import Variable
 
 class Generator(nn.Module):
     def __init__(self, n_classes, latent_dim, img_shape):
         super(Generator, self).__init__()
         self.img_shape = img_shape
-        self.label_emb = nn.Embedding(n_classes, n_classes)
+        self.label_emb = OneHotEncoder(handle_unknown='ignore')
 
         def block(in_chann, out_chann, normalize=True):
             layers = [nn.Linear(in_chann, out_chann)]
@@ -25,10 +26,15 @@ class Generator(nn.Module):
             nn.Tanh()
         )
 
+    def train_one_hot(self, labels):
+        self.label_emb = self.label_emb.fit(labels.cpu().reshape(-1, 1))
+
     def forward(self, noise, labels):
         # Concatenate label embedding and image to produce input
-        embedded = self.label_emb(labels)
-        gen_input = torch.cat((embedded, noise), -1)
+        transformed = self.label_emb.transform(labels.cpu().reshape(-1, 1)).toarray()
+        embedded_tensor = torch.cuda.FloatTensor(transformed)
+
+        gen_input = torch.cat((embedded_tensor, noise), 1)
         img = self.model(gen_input)
         img = img.view(img.size(0), *self.img_shape)
         return img
