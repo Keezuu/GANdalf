@@ -27,11 +27,11 @@ class Generator(nn.Module):
         )
 
     def train_one_hot(self, labels):
-        self.label_emb = self.label_emb.fit(labels.cpu().reshape(-1, 1))
+        self.label_emb = self.label_emb.fit(labels.reshape(1, -1))
 
     def forward(self, noise, labels):
         # Concatenate label embedding and image to produce input
-        transformed = self.label_emb.transform(labels.cpu().reshape(-1, 1)).toarray()
+        transformed = self.label_emb.transform(labels.reshape(-1, 1)).toarray()
         embedded_tensor = torch.cuda.FloatTensor(transformed)
 
         gen_input = torch.cat((embedded_tensor, noise), 1)

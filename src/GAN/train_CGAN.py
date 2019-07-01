@@ -70,8 +70,8 @@ D = Discriminator(img_shape=(28, 28), n_classes=10).cuda()
 G = Generator(img_shape=(28, 28), n_classes=10, latent_dim=cnst.GAN_LATENT_SIZE).cuda()
 # Train generator one-hot encoder
 one_hot_labels = np.arange(10)
-G.train_one_hot(Variable(LongTensor(one_hot_labels)))
-D.train_one_hot(Variable(LongTensor(one_hot_labels)))
+G.train_one_hot(one_hot_labels)
+D.train_one_hot(one_hot_labels)
 
 # Create MSE loss function
 adv_loss = nn.MSELoss().cuda()
@@ -100,7 +100,7 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
         fake = Variable(FloatTensor(batch_size, 1).fill_(0.0), requires_grad=False)
         # Configure input
         real_imgs = Variable(imgs.type(FloatTensor))
-        labels = Variable(labels.type(LongTensor))
+
         # -----------------
         #  Train Generator
         # -----------------
@@ -109,7 +109,7 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
 
         # Sample noise and labels as generator input
         z = Variable(FloatTensor(np.random.normal(0, 1, (batch_size, cnst.GAN_LATENT_SIZE))))
-        gen_labels = Variable(LongTensor(np.random.randint(0, 10, batch_size)))
+        gen_labels = np.random.randint(0, 10, batch_size)
 
         # Generate a batch of images
         gen_imgs = G(z, gen_labels)

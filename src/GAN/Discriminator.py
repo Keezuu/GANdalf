@@ -26,13 +26,13 @@ class Discriminator(nn.Module):
         )
 
     def train_one_hot(self, labels):
-        self.label_emb = self.label_emb.fit(labels.cpu().reshape(-1, 1))
+        self.label_emb = self.label_emb.fit(labels.reshape(1, -1))
 
     def forward(self, img, labels):
         # Concatenate label embedding and image to produce input
-        transformed = self.label_emb.transform(labels.cpu().reshape(-1, 1)).toarray()
+        transformed = self.label_emb.transform(labels.reshape(-1, 1)).toarray()
         embedded_tensor = torch.cuda.FloatTensor(transformed)
         transformed_img = img.view(img.size(0), -1)
-        d_in = torch.cat(( transformed_img, embedded_tensor), 1)
+        d_in = torch.cat((transformed_img,  embedded_tensor), -1)
         validity = self.model(d_in)
         return validity
