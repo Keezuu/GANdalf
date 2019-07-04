@@ -15,19 +15,20 @@ if not os.path.exists(cnst.GAN_SAMPLES_DIR):
 if not os.path.exists(cnst.GAN_SAVE_DIR):
     os.makedirs(cnst.GAN_SAVE_DIR)
 
+n_classess = 10
+
 # Import MNIST dataset
-G = Generator(img_shape=(28, 28), n_classes=10, latent_dim=cnst.GAN_LATENT_SIZE).cuda()
+G = Generator(img_shape=(28, 28), n_classes=n_classess, latent_dim=cnst.GAN_LATENT_SIZE).cuda()
 FloatTensor = torch.cuda.FloatTensor
 LongTensor = torch.cuda.LongTensor
 
 G.load_state_dict(torch.load('G.ckpt'))
 
-n_class = 10
-
-
-z = FloatTensor(np.random.normal(0, 1, (12, cnst.GAN_LATENT_SIZE)))
+num_of_images = 2
+z = FloatTensor(np.random.normal(0, 1, (num_of_images, cnst.GAN_LATENT_SIZE)))
 # Get labels ranging from 0 to n_classes for n rows
-labels = np.array([num for _ in range(2) for num in range(5, -1, -1)])
+labels = np.array([1 for x in range(num_of_images)])
+#labels = np.array([num for _ in range(2) for num in range(5, -1, -1)])
 #labels = np.array([1 for _ in range(4)])
 np.random.shuffle(labels)
 #labels = np.array([num for _ in range(20) for num in range(10, 0, -1)])
@@ -46,9 +47,9 @@ G.train_one_hot(one_hot_labels)
 gen_imgs = G(z, labels)
 
 save_image(gen_imgs.reshape(gen_imgs.shape[0], 1, gen_imgs.shape[1], gen_imgs.shape[2]).data,
-           os.path.join(cnst.GAN_SAMPLES_DIR, "generatedVIS3.png"), nrow=n_class, normalize=True)
+           os.path.join(cnst.GAN_SAMPLES_DIR, "generatedVIS3.png"), nrow=n_classess, normalize=True)
 save_image(gen_imgs.reshape(gen_imgs.shape[0], 1, gen_imgs.shape[1], gen_imgs.shape[2]).data,
-           os.path.join(cnst.GAN_SAMPLES_DIR, "generatedVIS4.png"), nrow=n_class*10, normalize=True)
+           os.path.join(cnst.GAN_SAMPLES_DIR, "generatedVIS4.png"), nrow=n_classess*10, normalize=True)
 gen_imgs = gen_imgs.cpu().data.numpy()
 
 # Move the data to CPU and then copy it to numpy array

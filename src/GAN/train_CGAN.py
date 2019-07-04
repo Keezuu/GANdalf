@@ -15,8 +15,7 @@ from torchvision.transforms import transforms
 from src.GAN.Discriminator import Discriminator
 from src.GAN.Generator import Generator
 import src.resources.constants as cnst
-from src.resources.utilities import sample_image, denorm, generate_gif, save_statistics
-
+from src.resources.utilities import sample_image, denorm, generate_gif, save_statistics, sample_same_label_image
 
 # Create directories if they don't exist
 if not os.path.exists(cnst.GAN_SAMPLES_DIR):
@@ -41,19 +40,23 @@ mnist = torchvision.datasets.MNIST(root=cnst.DATA_DIR,
                                    transform=transform,
                                    download=True)
 
-# Get only a part of the data
-subset_indices = [x for x in range (cnst.GAN_MNIST_TRAINING_SIZE)]
-mnist = torch.utils.data.Subset(mnist, subset_indices)
+# Get only a part of the data if specified training size is lesser than the size of mnist dataset
+if cnst.GAN_MNIST_TRAINING_SIZE < len(mnist.data):
+    subset_indices = [x for x in range (cnst.GAN_MNIST_TRAINING_SIZE)]
+    mnist = torch.utils.data.Subset(mnist, subset_indices)
+    # Check how many instances of each class there is
+
+    cnt_labels = np.zeros(10)
+    for i in subset_indices:
+        cnt_labels[mnist[i][-1]] += 1
+    print("Number of image from given class: ")
+
+    for idx, val in enumerate(cnt_labels):
+        print(str(idx) + ": " + str(val))
 
 
-cnt_labels = np.zeros(10)
 
-#Check how many instances of each class there is
-for i in subset_indices:
-    cnt_labels[mnist[i][-1]] += 1
-print("Number of image from given class: ")
-for idx, val in enumerate(cnt_labels):
-    print(str(idx) + ": " + str(val))
+
 
 # Create data loader with shuffling allowed
 data_loader = torch.utils.data.DataLoader(dataset=mnist,
@@ -117,7 +120,6 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
         validity = D(gen_imgs, gen_labels)
         g_loss = adv_loss(validity, valid)
 
-
         g_loss.backward()
         G_opt.step()
 
@@ -154,8 +156,21 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
                           real_score.mean().data, fake_score.mean().data))
 
         batches_done = epoch * len(data_loader) + i
+        plt.clf()
 
 
+    # Show samples for debug purposes
+    if epoch % 5 == 0:
+        # Sample 4 noise and labels for debug and visualization purposes
+        z = FloatTensor(np.random.normal(0, 1, (4, cnst.GAN_LATENT_SIZE)))
+        sample_labels = np.random.randint(0, 10, 4)
+
+        # Generate a batch of images
+        sample_imgs = G(z, sample_labels)
+        for i, label in enumerate(sample_labels):
+            plt.title('Label is {label}'.format(label=label))
+            plt.imshow(sample_imgs.detach().cpu().numpy()[i], cmap='gray')
+            plt.show()
 
     #Create save folder
 
@@ -174,6 +189,9 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
     if epoch % 5 == 0:
         sample_image(G, n_row=10, name=str(epoch).zfill(len(str(cnst.GAN_NUM_EPOCHS))),
                      path=os.path.join(cnst.GAN_SAMPLES_DIR, date))
+        sample_same_label_image(G, available_labels=one_hot_labels, n_cols=10, name=str(epoch).zfill(len(str(cnst.GAN_NUM_EPOCHS))),
+                     path=os.path.join(cnst.GAN_SAMPLES_DIR+"-2", date))
+
 
     # Save and plot Statistics
     save_statistics(d_losses, g_losses, fake_scores, real_scores, os.path.join(cnst.GAN_SAVE_DIR, date))

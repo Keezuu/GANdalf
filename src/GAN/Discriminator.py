@@ -25,7 +25,7 @@ class Discriminator(nn.Module):
         )
 
     def train_one_hot(self, labels):
-        self.label_emb = self.label_emb.fit(labels.reshape(1, -1))
+        self.label_emb = self.label_emb.fit(labels.reshape(-1, 1))
 
     def forward(self, img, labels):
         # Concatenate label embedding and image to produce input

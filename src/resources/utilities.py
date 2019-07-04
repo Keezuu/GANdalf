@@ -67,6 +67,19 @@ def sample_image(G, n_row, name, path):
     save_image(gen_imgs.reshape(gen_imgs.shape[0], 1, gen_imgs.shape[1], gen_imgs.shape[2]).data,
                os.path.join(path, "img",  name+".png"), nrow=n_row, normalize=True)
 
+def sample_same_label_image(G, available_labels, n_cols, name, path):
+    """Saves a grid of generated digits ranging from 0 to n_classes"""
+    # Sample noise
+    z = torch.cuda.FloatTensor(np.random.normal(0, 1, (n_cols ** 2, cnst.GAN_LATENT_SIZE)))
+    # Get labels ranging from 0 to n_classes for n rows
+    labels = np.array([label  for label in available_labels for _ in range(n_cols)])
+    labels = torch.cuda.LongTensor(labels)
+    gen_imgs = G(z, labels.cpu())
+    if not os.path.exists(os.path.join(path, "img")):
+        os.makedirs(os.path.join(path, "img"))
+    save_image(gen_imgs.reshape(gen_imgs.shape[0], 1, gen_imgs.shape[1], gen_imgs.shape[2]).data,
+               os.path.join(path, "img",  name+".png"), nrow=n_cols, normalize=True)
+
 def check_for_gpu():
     # Make sure that we're using gpu
     from tensorflow.python.client import device_lib
