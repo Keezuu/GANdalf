@@ -5,7 +5,6 @@ import torchvision
 import torch.nn as nn
 from torchvision import transforms
 from torchvision.utils import save_image
-from torch.autograd import Variable
 import matplotlib.pyplot as plt
 import pylab
 import numpy as np
@@ -96,10 +95,10 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
     for i, (imgs, labels) in enumerate(data_loader):
         batch_size = imgs.shape[0]
         # Adversarial ground truths
-        valid = Variable(FloatTensor(batch_size, 1).fill_(1.0), requires_grad=False)
-        fake = Variable(FloatTensor(batch_size, 1).fill_(0.0), requires_grad=False)
+        valid = FloatTensor(batch_size, 1).fill_(1.0)
+        fake = FloatTensor(batch_size, 1).fill_(0.0)
         # Configure input
-        real_imgs = Variable(imgs.type(FloatTensor))
+        real_imgs = imgs.type(FloatTensor)
 
         # -----------------
         #  Train Generator
@@ -108,7 +107,7 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
         G_opt.zero_grad()
 
         # Sample noise and labels as generator input
-        z = Variable(FloatTensor(np.random.normal(0, 1, (batch_size, cnst.GAN_LATENT_SIZE))))
+        z = FloatTensor(np.random.normal(0, 1, (batch_size, cnst.GAN_LATENT_SIZE)))
         gen_labels = np.random.randint(0, 10, batch_size)
 
         # Generate a batch of images

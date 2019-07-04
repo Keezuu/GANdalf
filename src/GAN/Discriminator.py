@@ -2,7 +2,6 @@ from fastai.imports import torch
 from sklearn.preprocessing import OneHotEncoder
 from torch import nn
 import numpy as np
-from torch.autograd import Variable
 
 # A discriminator class for predicting if image is fake or real
 

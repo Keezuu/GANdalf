@@ -2,7 +2,6 @@ from fastai.imports import torch
 from torch import nn
 import numpy as np
 from sklearn.preprocessing import OneHotEncoder
-from torch.autograd import Variable
 
 class Generator(nn.Module):
     def __init__(self, n_classes, latent_dim, img_shape):
@@ -27,7 +26,7 @@ class Generator(nn.Module):
         )
 
     def train_one_hot(self, labels):
-        self.label_emb = self.label_emb.fit(labels.reshape(1, -1))
+        self.label_emb = self.label_emb.fit(labels.reshape(-1, 1))
 
     def forward(self, noise, labels):
         # Concatenate label embedding and image to produce input

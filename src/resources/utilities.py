@@ -6,7 +6,6 @@ import src.resources.constants as cnst
 import keras.utils
 import os
 from torchvision.utils import save_image
-from torch.autograd import Variable
 import torch
 import imageio
 import matplotlib.pyplot as plt
@@ -58,11 +57,11 @@ def denorm(x):
 def sample_image(G, n_row, name, path):
     """Saves a grid of generated digits ranging from 0 to n_classes"""
     # Sample noise
-    z = Variable(torch.cuda.FloatTensor(np.random.normal(0, 1, (n_row ** 2, cnst.GAN_LATENT_SIZE))))
+    z = torch.cuda.FloatTensor(np.random.normal(0, 1, (n_row ** 2, cnst.GAN_LATENT_SIZE)))
     # Get labels ranging from 0 to n_classes for n rows
     labels = np.array([num for _ in range(n_row) for num in range(n_row)])
-    labels = Variable(torch.cuda.LongTensor(labels))
-    gen_imgs = G(z, labels)
+    labels = torch.cuda.LongTensor(labels)
+    gen_imgs = G(z, labels.cpu())
     if not os.path.exists(os.path.join(path, "img")):
         os.makedirs(os.path.join(path, "img"))
     save_image(gen_imgs.reshape(gen_imgs.shape[0], 1, gen_imgs.shape[1], gen_imgs.shape[2]).data,

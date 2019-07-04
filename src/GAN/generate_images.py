@@ -1,6 +1,5 @@
 import os
 import torch
-from torch.autograd import Variable
 import numpy as np
 from torchvision.utils import save_image
 from src.resources import constants as cnst
@@ -26,19 +25,23 @@ G.load_state_dict(torch.load('G.ckpt'))
 n_class = 10
 
 
-z = FloatTensor(np.random.normal(0, 1, (10000, cnst.GAN_LATENT_SIZE)))
+z = FloatTensor(np.random.normal(0, 1, (12, cnst.GAN_LATENT_SIZE)))
 # Get labels ranging from 0 to n_classes for n rows
-labels = np.array([num for _ in range(1000) for num in range(n_class)])
+labels = np.array([num for _ in range(2) for num in range(5, -1, -1)])
+#labels = np.array([1 for _ in range(4)])
+np.random.shuffle(labels)
+#labels = np.array([num for _ in range(20) for num in range(10, 0, -1)])
 
-# This throws ValueError strides are negative (?????)
-#one_hot_labels = np.arange(10)
+
+one_hot_labels = np.arange(10)
+# This throws ValueError strides are negative in Generator (?????)
 #one_hot_labels = np.flipud(one_hot_labels)
 
-one_hot_labels = np.zeros(10)
-for i in range(0, 10):
-    one_hot_labels[i] = i
+#one_hot_labels = np.zeros(10)
+#for i in range(10, 0, -1):
+   # one_hot_labels[10 - i] = i-1
 
-print(one_hot_labels.reshape(1, -1))
+#print(one_hot_labels.reshape(1, -1))
 G.train_one_hot(one_hot_labels)
 gen_imgs = G(z, labels)
 
@@ -54,8 +57,8 @@ np.save(file=os.path.join(cnst.GAN_DATA_DIR, "gan_labels.npy"), arr=labels)
 
 
 
-for i in range(n_class):
-    plt.title('Label is {label}'.format(label=i))
+for i, label in enumerate(labels):
+    plt.title('Label is {label}'.format(label=label))
     plt.imshow(gen_imgs[i], cmap='gray')
     plt.show()
 print("")
