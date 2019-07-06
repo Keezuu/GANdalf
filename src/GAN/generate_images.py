@@ -28,21 +28,16 @@ num_of_images = 2
 z = FloatTensor(np.random.normal(0, 1, (num_of_images, cnst.GAN_LATENT_SIZE)))
 # Get labels ranging from 0 to n_classes for n rows
 labels = np.array([1 for x in range(num_of_images)])
-#labels = np.array([num for _ in range(2) for num in range(5, -1, -1)])
-#labels = np.array([1 for _ in range(4)])
-np.random.shuffle(labels)
-#labels = np.array([num for _ in range(20) for num in range(10, 0, -1)])
 
+available_labels = [3]
+single_label_imgs_num = 100
+z = torch.cuda.FloatTensor(np.random.normal(0, 1,
+                                            (len(available_labels)*single_label_imgs_num ,
+                                             cnst.GAN_LATENT_SIZE)))
+# Get labels ranging from 0 to n_classes for n rows
+labels = np.array([label for label in available_labels for _ in range(single_label_imgs_num)])
 
 one_hot_labels = np.arange(10)
-# This throws ValueError strides are negative in Generator (?????)
-#one_hot_labels = np.flipud(one_hot_labels)
-
-#one_hot_labels = np.zeros(10)
-#for i in range(10, 0, -1):
-   # one_hot_labels[10 - i] = i-1
-
-#print(one_hot_labels.reshape(1, -1))
 G.train_one_hot(one_hot_labels)
 gen_imgs = G(z, labels)
 
@@ -62,4 +57,6 @@ for i, label in enumerate(labels):
     plt.title('Label is {label}'.format(label=label))
     plt.imshow(gen_imgs[i], cmap='gray')
     plt.show()
+    if i > 5:
+        break
 print("")
