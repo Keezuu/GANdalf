@@ -86,7 +86,7 @@ D.apply(weights_init)
 G = Generator(img_shape=(28, 28), n_classes=10, latent_dim=cnst.GAN_LATENT_SIZE).cuda()
 G.apply(weights_init)
 # Create MSE loss function
-adv_loss = nn.BCELoss().cuda()
+bce_loss = nn.BCELoss().cuda()
 
 # Create optimizers as specified in DCGAN paper
 G_opt = torch.optim.Adam(G.parameters(), lr=0.0002, betas=(0.5, 0.999))
@@ -126,8 +126,8 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
         gen_imgs = G(z, gen_labels)
 
         # Loss measures generator's ability to fool the discriminator
-        validity = D(gen_imgs, gen_labels)
-        g_loss = adv_loss(validity, valid)
+        validity = D(gen_imgs)
+        g_loss = bce_loss(validity, valid)
 
         g_loss.backward()
         G_opt.step()
@@ -139,13 +139,13 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
         D_opt.zero_grad()
 
         # Loss for real images
-        validity_real = D(real_imgs, labels)
-        d_real_loss = adv_loss(validity_real, valid)
+        validity_real = D(real_imgs)
+        d_real_loss = bce_loss(validity_real, valid)
         real_score = validity_real
 
         # Loss for fake images
-        validity_fake = D(gen_imgs.detach(), gen_labels)
-        d_fake_loss = adv_loss(validity_fake, fake)
+        validity_fake = D(gen_imgs.detach())
+        d_fake_loss = bce_loss(validity_fake, fake)
         fake_score = validity_fake
         # Total discriminator loss
         d_loss = (d_real_loss + d_fake_loss) / 2
