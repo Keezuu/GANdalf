@@ -3,21 +3,21 @@ from torch import nn
 import numpy as np
 from sklearn.preprocessing import OneHotEncoder
 
+
 class Generator(nn.Module):
     def __init__(self, n_classes, latent_dim, img_shape):
         super(Generator, self).__init__()
-        self.img_shape = img_shape
         self.label_emb = OneHotEncoder(handle_unknown='ignore')
 
-        def block(in_chann, out_chann, normalize=True):
-            layers = [nn.Linear(in_chann, out_chann)]
-            if normalize:
-                layers.append(nn.BatchNorm1d(out_chann, 0.8))
-            layers.append(nn.LeakyReLU(0.2, inplace=True))
+
+        def block(in_chann, out_chann):
+            layers = [nn.Linear(in_chann, out_chann),
+                      nn.BatchNorm1d(out_chann, 0.8),
+                      nn.LeakyReLU(0.2, inplace=True)]
             return layers
 
         self.model = nn.Sequential(
-            *block(latent_dim + n_classes, 128, normalize=False),
+            *block(latent_dim + n_classes, 128),
             *block(128, 256),
             *block(256, 512),
             *block(512, 1024),

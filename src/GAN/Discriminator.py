@@ -12,6 +12,7 @@ class Discriminator(nn.Module):
 
         self.label_emb = OneHotEncoder(handle_unknown='ignore')
 
+        # TODO: Add Batchnorm
         self.model = nn.Sequential(
             nn.Linear(n_classes + int(np.prod(img_shape)), 512),
             nn.LeakyReLU(0.2, inplace=True),

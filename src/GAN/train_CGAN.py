@@ -17,6 +17,22 @@ from src.GAN.Generator import Generator
 import src.resources.constants as cnst
 from src.resources.utilities import sample_image, denorm, generate_gif, save_statistics, sample_same_label_image
 
+
+# From pytorch DCGAN tutorial
+# custom weights initialization called on netG and netD
+def weights_init(m):
+    classname = m.__class__.__name__
+    if classname.find('Conv') != -1:
+        nn.init.normal_(m.weight.data, 0.0, 0.02)
+    elif classname.find('BatchNorm') != -1:
+        nn.init.normal_(m.weight.data, 1.0, 0.02)
+        nn.init.constant_(m.bias.data, 0)
+
+
+
+
+
+
 # Create directories if they don't exist
 if not os.path.exists(cnst.GAN_SAMPLES_DIR):
     os.makedirs(cnst.GAN_SAMPLES_DIR)
