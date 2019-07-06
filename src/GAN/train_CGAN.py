@@ -29,10 +29,6 @@ def weights_init(m):
         nn.init.constant_(m.bias.data, 0)
 
 
-
-
-
-
 # Create directories if they don't exist
 if not os.path.exists(cnst.GAN_SAMPLES_DIR):
     os.makedirs(cnst.GAN_SAMPLES_DIR)
@@ -83,21 +79,18 @@ LongTensor = torch.cuda.LongTensor
 
 # Create discriminator and generator and force them to use GPU
 D = Discriminator(img_shape=(28, 28), n_classes=10).cuda()
-
+# Apply the weights init with value from a Normal distribution with mean=0, stdev=0.02.
+# As stated in DCGAN paper
+D.apply(weights_init)
 # Sample of labels to train OneHotEncoder in generator
 G = Generator(img_shape=(28, 28), n_classes=10, latent_dim=cnst.GAN_LATENT_SIZE).cuda()
-# Train generator one-hot encoder
-one_hot_labels = np.arange(10)
-G.train_one_hot(one_hot_labels)
-D.train_one_hot(one_hot_labels)
-
+G.apply(weights_init)
 # Create MSE loss function
-adv_loss = nn.MSELoss().cuda()
+adv_loss = nn.BCELoss().cuda()
 
-#Create optimizers
-G_opt = torch.optim.Adam(G.parameters(), lr=0.0002)
-D_opt = torch.optim.Adam(D.parameters(), lr=0.0002)
-
+# Create optimizers as specified in DCGAN paper
+G_opt = torch.optim.Adam(G.parameters(), lr=0.0002, betas=(0.5, 0.999))
+D_opt = torch.optim.Adam(D.parameters(), lr=0.0002, betas=(0.5, 0.999))
 
 
 # Statistics to be saved
