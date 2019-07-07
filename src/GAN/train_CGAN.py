@@ -85,6 +85,7 @@ D.apply(weights_init)
 # Sample of labels to train OneHotEncoder in generator
 G = Generator(img_shape=(28, 28), n_classes=10, latent_dim=cnst.GAN_LATENT_SIZE).cuda()
 G.apply(weights_init)
+print(G)
 # Create MSE loss function
 bce_loss = nn.BCELoss().cuda()
 
@@ -119,11 +120,12 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
         G_opt.zero_grad()
 
         # Sample noise and labels as generator input
-        z = FloatTensor(np.random.normal(0, 1, (batch_size, cnst.GAN_LATENT_SIZE)))
+        z = torch.randn(batch_size, cnst.GAN_LATENT_SIZE, 1, 1).cuda()
+        #z = FloatTensor(np.random.normal(0, 1, (batch_size, cnst.GAN_LATENT_SIZE)))
         gen_labels = np.random.randint(0, 10, batch_size)
 
         # Generate a batch of images
-        gen_imgs = G(z, gen_labels)
+        gen_imgs = G(z)
 
         # Loss measures generator's ability to fool the discriminator
         validity = D(gen_imgs)
@@ -169,17 +171,17 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
 
 
     # Show samples for debug purposes
-    if epoch % 5 == 0:
-        # Sample 4 noise and labels for debug and visualization purposes
-        z = FloatTensor(np.random.normal(0, 1, (4, cnst.GAN_LATENT_SIZE)))
-        sample_labels = np.random.randint(0, 10, 4)
-
-        # Generate a batch of images
-        sample_imgs = G(z, sample_labels)
-        for i, label in enumerate(sample_labels):
-            plt.title('Label is {label}'.format(label=label))
-            plt.imshow(sample_imgs.detach().cpu().numpy()[i], cmap='gray')
-            plt.show()
+    # if epoch % 5 == 0:
+    #     # Sample 4 noise and labels for debug and visualization purposes
+    #     z = FloatTensor(np.random.normal(0, 1, (4, cnst.GAN_LATENT_SIZE)))
+    #     sample_labels = np.random.randint(0, 10, 4)
+    #
+    #     # Generate a batch of images
+    #     sample_imgs = G(z, sample_labels)
+    #     for i, label in enumerate(sample_labels):
+    #         plt.title('Label is {label}'.format(label=label))
+    #         plt.imshow(sample_imgs.detach().cpu().numpy()[i], cmap='gray')
+    #         plt.show()
 
     #Create save folder
 
