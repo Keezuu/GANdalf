@@ -10,7 +10,7 @@ class Discriminator(nn.Module):
     def __init__(self, n_classes, img_shape):
         super(Discriminator, self).__init__()
 
-        self.main = nn.Sequential(
+        self.model = nn.Sequential(
             # input is (cnst.CHANNELS_NUM) x 64 x 64
             nn.Conv2d(cnst.CHANNELS_NUM, cnst.GAN_DIS_FEATURE_MAPS,
                       kernel_size=4, stride=2, padding=1, bias=False),

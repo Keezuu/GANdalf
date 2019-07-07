@@ -10,7 +10,7 @@ class Generator(nn.Module):
         super(Generator, self).__init__()
 
         self.model = nn.Sequential(
-            nn.ConvTranspose2d(latent_dim , 8*cnst.GAN_GEN_FEATURE_MAPS,
+            nn.ConvTranspose2d(latent_dim, 8*cnst.GAN_GEN_FEATURE_MAPS,
                                kernel_size=4, stride=1, padding=0, bias=False),
             nn.BatchNorm2d(cnst.GAN_GEN_FEATURE_MAPS*8),
             nn.ReLU(True),
@@ -25,7 +25,7 @@ class Generator(nn.Module):
             nn.BatchNorm2d(cnst.GAN_GEN_FEATURE_MAPS * 2),
             nn.ReLU(True),
             # state size. (cnst.GAN_GEN_FEATURE_MAPS*2) x 16 x 16
-            nn.ConvTranspose2d(cnst.GAN_GEN_FEATURE_MAPS * 2, cnst.GAN_GEN_FEATURE_MAPS,
+            nn.ConvTranspose2d(cnst.GAN_GEN_FEATURE_MAPS*2, cnst.GAN_GEN_FEATURE_MAPS,
                                4, 2, 1, bias=False),
             nn.BatchNorm2d(cnst.GAN_GEN_FEATURE_MAPS),
             nn.ReLU(True),
