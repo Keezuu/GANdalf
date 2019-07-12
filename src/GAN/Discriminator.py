@@ -32,19 +32,6 @@ class Discriminator(nn.Module):
             nn.Sigmoid()
         )
 
-        # TODO: Add Batchnorm
-        # self.model = nn.Sequential(
-        #     nn.Linear(n_classes + int(np.prod(img_shape)), 512),
-        #     nn.LeakyReLU(0.2, inplace=True),
-        #     nn.Linear(512, 512),
-        #     nn.Dropout(0.4),
-        #     nn.LeakyReLU(0.2, inplace=True),
-        #     nn.Linear(512, 512),
-        #     nn.Dropout(0.4),
-        #     nn.LeakyReLU(0.2, inplace=True),
-        #     nn.Linear(512, 1),
-        # )
-
 
     def forward(self, img):
         # # Concatenate label embedding and image to produce input
