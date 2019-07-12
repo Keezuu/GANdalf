@@ -27,27 +27,10 @@ class Generator(nn.Module):
             # state size. (cnst.GAN_GEN_FEATURE_MAPS*2) x 14 x 14
             nn.ConvTranspose2d(cnst.GAN_GEN_FEATURE_MAPS * 2, cnst.CHANNELS_NUM,
                                4, 2, 1, bias=False),
-            nn.BatchNorm2d(cnst.GAN_GEN_FEATURE_MAPS),
-            nn.ReLU(True),
+            nn.Tanh()
             # state size. (cnst.CHANNELS_NUM) x 28 x 28
             # Output is number of channels, for BW images its 1
-            nn.Tanh()
         )
-
-        # def block(in_chann, out_chann):
-        #     layers = [nn.Linear(in_chann, out_chann),
-        #               nn.BatchNorm1d(out_chann, 0.8),
-        #               nn.LeakyReLU(0.2, inplace=True)]
-        #     return layers
-        #
-        # self.model = nn.Sequential(
-        #     *block(latent_dim + n_classes, 128),
-        #     *block(128, 256),
-        #     *block(256, 512),
-        #     *block(512, 1024),
-        #     nn.Linear(1024, int(np.prod(img_shape))),
-        #     nn.Tanh()
-        # )
 
     def forward(self, noise):
         # Concatenate label embedding and image to produce input
