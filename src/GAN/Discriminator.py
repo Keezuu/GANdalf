@@ -11,27 +11,24 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
 
         self.model = nn.Sequential(
-            # input is (cnst.CHANNELS_NUM) x 64 x 64
+            # input is (cnst.CHANNELS_NUM) x 28 x 28
             nn.Conv2d(cnst.CHANNELS_NUM, cnst.GAN_DIS_FEATURE_MAPS,
-                      kernel_size=4, stride=2, padding=1, bias=False),
+                      kernel_size=3, stride=2, padding=1, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
-            # state size. (cnst.GAN_DIS_FEATURE_MAPS) x 32 x 32
+            # input is (cnst.GAN_DIS_FEATURE_MAPS) x 14 x 14
             nn.Conv2d(cnst.GAN_DIS_FEATURE_MAPS, cnst.GAN_DIS_FEATURE_MAPS * 2,
-                      4, 2, 1, bias=False),
+                      3, 2, 1, bias=False),
             nn.BatchNorm2d(cnst.GAN_DIS_FEATURE_MAPS * 2),
             nn.LeakyReLU(0.2, inplace=True),
-            # state size. (cnst.GAN_DIS_FEATURE_MAPS*2) x 16 x 16
+            # input is (cnst.GAN_DIS_FEATURE_MAPS*2) x 7 x 7
             nn.Conv2d(cnst.GAN_DIS_FEATURE_MAPS * 2, cnst.GAN_DIS_FEATURE_MAPS * 4,
-                      4, 2, 1, bias=False),
+                      3, 2, 1, bias=False),
             nn.BatchNorm2d(cnst.GAN_DIS_FEATURE_MAPS * 4),
             nn.LeakyReLU(0.2, inplace=True),
-            # state size. (cnst.GAN_DIS_FEATURE_MAPS*4) x 8 x 8
-            nn.Conv2d(cnst.GAN_DIS_FEATURE_MAPS * 4, cnst.GAN_DIS_FEATURE_MAPS * 8,
-                      4, 2, 1, bias=False),
-            nn.BatchNorm2d(cnst.GAN_DIS_FEATURE_MAPS * 8),
-            nn.LeakyReLU(0.2, inplace=True),
-            # state size. (cnst.GAN_DIS_FEATURE_MAPS*8) x 4 x 4
-            nn.Conv2d(cnst.GAN_DIS_FEATURE_MAPS * 8, 1, 4, 1, 0, bias=False),
+            # input is (cnst.GAN_DIS_FEATURE_MAPS*4) x 4 x 4
+            nn.Conv2d(cnst.GAN_DIS_FEATURE_MAPS * 4, 1,
+                      4, 1, 0, bias=False),
+            # Output is 1x1x1
             nn.Sigmoid()
         )
 
