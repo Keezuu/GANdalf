@@ -4,7 +4,7 @@ A DCGAN implementation for the MNIST dataset in PyTorch with classification usin
 
 
 
-#[ARCHITECTURE USED FOR BELOW RESULTS]
+## [ARCHITECTURE USED FOR BELOW RESULTS]
 Below results were achieved on conditional GAN (not DCGAN).
 ## TODO: 
 a) Try to make the dataset even smaller (~1000 images) and optimize the GAN to achieve more impactful results.
