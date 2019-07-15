@@ -88,7 +88,7 @@ G.apply(weights_init)
 print(G)
 print(D)
 # Create BCE loss function
-bce_loss = nn.MSELoss().cuda()
+mse_loss = nn.MSELoss().cuda()
 
 # Create optimizers as specified in DCGAN paper
 G_opt = torch.optim.Adam(G.parameters(), lr=0.0002, betas=(0.5, 0.999))
@@ -130,7 +130,10 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
         # Loss measures generator's ability to fool the discriminator
         validity = D(gen_imgs)
 
-        g_loss = bce_loss(validity, valid)
+        # We try to maximize log(D(G(z))) as it doesn't have vanishing gradients
+        # whereas trying to minimize log(1-D(G(z))) does
+        # Goodfellow et. al (2014)
+        g_loss = mse_loss(validity, valid)
 
         g_loss.backward()
         G_opt.step()
@@ -141,15 +144,18 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
 
         D_opt.zero_grad()
 
+        # Training on batch of fake and batch of real images separately
+        # as proposed in tips to training gans: https://github.com/soumith/ganhacks
         # Loss for real images
         validity_real = D(real_imgs)
-        d_real_loss = bce_loss(validity_real, valid)
+        d_real_loss = mse_loss(validity_real, valid)
         real_score = validity_real
 
         # Loss for fake images
         validity_fake = D(gen_imgs.detach())
-        d_fake_loss = bce_loss(validity_fake, fake)
+        d_fake_loss = mse_loss(validity_fake, fake)
         fake_score = validity_fake
+
         # Total discriminator loss
         d_loss = (d_real_loss + d_fake_loss) / 2
 
