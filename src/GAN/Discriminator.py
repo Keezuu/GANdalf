@@ -15,20 +15,24 @@ class Discriminator(nn.Module):
             nn.Conv2d(cnst.CHANNELS_NUM, cnst.GAN_DIS_FEATURE_MAPS,
                       kernel_size=3, stride=2, padding=1, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
-            # input is (cnst.GAN_DIS_FEATURE_MAPS) x 14 x 14
+            # out is (cnst.GAN_DIS_FEATURE_MAPS) x 14 x 14
+            # ---------
             nn.Conv2d(cnst.GAN_DIS_FEATURE_MAPS, cnst.GAN_DIS_FEATURE_MAPS * 2,
                       3, 2, 1, bias=False),
             nn.BatchNorm2d(cnst.GAN_DIS_FEATURE_MAPS * 2),
             nn.LeakyReLU(0.2, inplace=True),
-            # input is (cnst.GAN_DIS_FEATURE_MAPS*2) x 7 x 7
+            # out is (cnst.GAN_DIS_FEATURE_MAPS*2) x 7 x 7
+            # ---------
             nn.Conv2d(cnst.GAN_DIS_FEATURE_MAPS * 2, cnst.GAN_DIS_FEATURE_MAPS * 4,
                       3, 2, 1, bias=False),
             nn.BatchNorm2d(cnst.GAN_DIS_FEATURE_MAPS * 4),
             nn.LeakyReLU(0.2, inplace=True),
-            # input is (cnst.GAN_DIS_FEATURE_MAPS*4) x 4 x 4
+            # out is (cnst.GAN_DIS_FEATURE_MAPS*4) x 4 x 4
+            # ---------
             nn.Conv2d(cnst.GAN_DIS_FEATURE_MAPS * 4, 1,
                       4, 1, 0, bias=False),
             # Output is 1x1x1
+            # ---------
             nn.Sigmoid()
         )
 

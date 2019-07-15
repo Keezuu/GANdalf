@@ -41,20 +41,20 @@ if not os.path.exists(cnst.GAN_SAVE_DIR):
 date = datetime.datetime.now().strftime("%m%d%H%M%S")
 
 # Image processing
+# Normalize the images to [-1, 1]
 transform = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize([0.5], [0.5])])
 
 # Import MNIST dataset
-
 mnist = torchvision.datasets.MNIST(root=cnst.DATA_DIR,
                                    train=True,
                                    transform=transform,
                                    download=True)
 
-# Get only a part of the data if specified training size is lesser than the size of mnist dataset
+# Get only a part of the data if specified training size is less than the size of mnist dataset
 if cnst.GAN_MNIST_TRAINING_SIZE < len(mnist.data):
-    subset_indices = [x for x in range (cnst.GAN_MNIST_TRAINING_SIZE)]
+    subset_indices = [x for x in range(cnst.GAN_MNIST_TRAINING_SIZE)]
     mnist = torch.utils.data.Subset(mnist, subset_indices)
     # Check how many instances of each class there is
 
@@ -66,14 +66,14 @@ if cnst.GAN_MNIST_TRAINING_SIZE < len(mnist.data):
     for idx, val in enumerate(cnt_labels):
         print(str(idx) + ": " + str(val))
 
-
-
-
+# Get GPU
+device = torch.device("cuda:0" if (torch.cuda.is_available()) else "cpu")
 
 # Create data loader with shuffling allowed
 data_loader = torch.utils.data.DataLoader(dataset=mnist,
                                           batch_size=cnst.GAN_BATCH_SIZE,
                                           shuffle=True)
+
 FloatTensor = torch.cuda.FloatTensor
 LongTensor = torch.cuda.LongTensor
 
@@ -82,17 +82,17 @@ D = Discriminator(img_shape=(28, 28), n_classes=10).cuda()
 # Apply the weights init with value from a Normal distribution with mean=0, stdev=0.02.
 # As stated in DCGAN paper
 D.apply(weights_init)
-# Sample of labels to train OneHotEncoder in generator
+# Create generator
 G = Generator(img_shape=(28, 28), n_classes=10, latent_dim=cnst.GAN_LATENT_SIZE).cuda()
 G.apply(weights_init)
 print(G)
-# Create MSE loss function
-bce_loss = nn.BCELoss().cuda()
+print(D)
+# Create BCE loss function
+bce_loss = nn.MSELoss().cuda()
 
 # Create optimizers as specified in DCGAN paper
 G_opt = torch.optim.Adam(G.parameters(), lr=0.0002, betas=(0.5, 0.999))
 D_opt = torch.optim.Adam(D.parameters(), lr=0.0002, betas=(0.5, 0.999))
-
 
 # Statistics to be saved
 d_losses = np.zeros(cnst.GAN_NUM_EPOCHS)
@@ -100,18 +100,19 @@ g_losses = np.zeros(cnst.GAN_NUM_EPOCHS)
 real_scores = np.zeros(cnst.GAN_NUM_EPOCHS)
 fake_scores = np.zeros(cnst.GAN_NUM_EPOCHS)
 
-
 # Training
 batches_done = 0
 total_step = len(data_loader)
 for epoch in range(cnst.GAN_NUM_EPOCHS):
     for i, (imgs, labels) in enumerate(data_loader):
         batch_size = imgs.shape[0]
+
         # Adversarial ground truths
-        valid = FloatTensor(batch_size, 1).fill_(1.0)
-        fake = FloatTensor(batch_size, 1).fill_(0.0)
+        valid = FloatTensor(batch_size, 1).fill_(1.0).cuda()
+        fake = FloatTensor(batch_size, 1).fill_(0.0).cuda()
+
         # Configure input
-        real_imgs = imgs.type(FloatTensor)
+        real_imgs = imgs.cuda()
 
         # -----------------
         #  Train Generator
@@ -119,9 +120,8 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
 
         G_opt.zero_grad()
 
-        # Sample noise and labels as generator input
-        z = torch.randn(batch_size, cnst.GAN_LATENT_SIZE, 1, 1).cuda()
-        #z = FloatTensor(np.random.normal(0, 1, (batch_size, cnst.GAN_LATENT_SIZE)))
+        # Sample noise as generator input
+        z = torch.randn(batch_size, cnst.GAN_LATENT_SIZE, 1, 1, device=device)
         gen_labels = np.random.randint(0, 10, batch_size)
 
         # Generate a batch of images
@@ -129,6 +129,7 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
 
         # Loss measures generator's ability to fool the discriminator
         validity = D(gen_imgs)
+
         g_loss = bce_loss(validity, valid)
 
         g_loss.backward()
@@ -155,7 +156,7 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
         d_loss.backward()
         D_opt.step()
 
-        #Update statistics
+        # Update statistics
         d_losses[epoch] = d_losses[epoch] * (i / (i + 1.)) + d_loss.data * (1. / (i + 1.))
         g_losses[epoch] = g_losses[epoch] * (i / (i + 1.)) + g_loss.data * (1. / (i + 1.))
         real_scores[epoch] = real_scores[epoch] * (i / (i + 1.)) + real_score.mean().data * (1. / (i + 1.))
@@ -168,7 +169,6 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
 
         batches_done = epoch * len(data_loader) + i
         plt.clf()
-
 
     # Show samples for debug purposes
     # if epoch % 5 == 0:
@@ -183,7 +183,7 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
     #         plt.imshow(sample_imgs.detach().cpu().numpy()[i], cmap='gray')
     #         plt.show()
 
-    #Create save folder
+    # Create save folder
 
     if not os.path.exists(os.path.join(cnst.GAN_SAVE_DIR, date)):
         os.makedirs(os.path.join(cnst.GAN_SAVE_DIR, date))
@@ -195,22 +195,21 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
     # Save real images
     if (epoch + 1) == 1:
         images = imgs.view(imgs.size(0), 1, 28, 28)
-        save_image(denorm(imgs.data), os.path.join(cnst.GAN_SAMPLES_DIR, date,  'real_images.png'))
+        save_image(denorm(imgs.data), os.path.join(cnst.GAN_SAMPLES_DIR, date, 'real_images.png'))
     # Save sampled images
     if epoch % 5 == 0:
         sample_image(G, n_row=10, name=str(epoch).zfill(len(str(cnst.GAN_NUM_EPOCHS))),
                      path=os.path.join(cnst.GAN_SAMPLES_DIR, date))
-        sample_same_label_image(G, available_labels=one_hot_labels, n_cols=10, name=str(epoch).zfill(len(str(cnst.GAN_NUM_EPOCHS))),
-                     path=os.path.join(cnst.GAN_SAMPLES_DIR+"-2", date))
-
+    #   sample_same_label_image(G, available_labels=one_hot_labels, n_cols=10, name=str(epoch).zfill(len(str(cnst.GAN_NUM_EPOCHS))),
+    #                path=os.path.join(cnst.GAN_SAMPLES_DIR+"-2", date))
 
     # Save and plot Statistics
     save_statistics(d_losses, g_losses, fake_scores, real_scores, os.path.join(cnst.GAN_SAVE_DIR, date))
 
     # Save model at checkpoints
-    if (epoch+1) % 50 == 0:
-        torch.save(G.state_dict(), os.path.join(cnst.GAN_MODEL_DIR, date, 'G--{}.ckpt'.format(epoch+1)))
-        torch.save(D.state_dict(), os.path.join(cnst.GAN_MODEL_DIR, date, 'D--{}.ckpt'.format(epoch+1)))
+    if (epoch + 1) % 50 == 0:
+        torch.save(G.state_dict(), os.path.join(cnst.GAN_MODEL_DIR, date, 'G--{}.ckpt'.format(epoch + 1)))
+        torch.save(D.state_dict(), os.path.join(cnst.GAN_MODEL_DIR, date, 'D--{}.ckpt'.format(epoch + 1)))
 
 # Save the model checkpoints
 torch.save(G.state_dict(), 'G.ckpt')
@@ -218,5 +217,5 @@ torch.save(D.state_dict(), 'D.ckpt')
 
 # generate gif
 filenames = os.listdir(os.path.join(cnst.GAN_SAMPLES_DIR, date, "img"))
-generate_gif(filenames, save_path=os.path.join(cnst.GAN_SAVE_DIR, date), read_path=os.path.join(cnst.GAN_SAMPLES_DIR, date))
-
+generate_gif(filenames, save_path=os.path.join(cnst.GAN_SAVE_DIR, date),
+             read_path=os.path.join(cnst.GAN_SAMPLES_DIR, date))
