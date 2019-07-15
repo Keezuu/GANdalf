@@ -5,11 +5,7 @@ A DCGAN implementation for the MNIST dataset in PyTorch with classification usin
 
 
 ## [ARCHITECTURE USED FOR BELOW RESULTS]
-Below results were achieved on conditional GAN (not DCGAN).
-## TODO: 
-a) Try to make the dataset even smaller (~1000 images) and optimize the GAN to achieve more impactful results.
-
-b) Optimize the GAN to generate better images to achieve better results
+Below results were achieved on conditional GAN (not DCGAN) as a part of university project aiming at comparing accuracy obtained by feed-forward networks versus convolutional neural networks. The project was extended by trying to increase the limited MNIST dataset (number of test samples below) by generating new images with conditional Generative Adversarial Network. The network currently is being rebuild into conditional DCGAN as it is proven to provide better results for image generation. The dataset may later be swapped to more complex like CIFAR-10. The projects itself is kind of a sandbox for learning the mechanisms of Generative Adversarial Networks and the logic behind them.
 
 ## Purpose
 The purpose of this implementation is to generate a dataset similar to the MNIST
