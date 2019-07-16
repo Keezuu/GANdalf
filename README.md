@@ -1,6 +1,6 @@
 # DataAugmentationWithGAN
 [WORK IN PROGRESS]
-A DCGAN implementation for the MNIST dataset in PyTorch with classification using convolutional neural network implementation in Keras.
+Rebuilding from conditional GAN to conditional DCGAN implementation for the MNIST dataset in PyTorch with classification using convolutional neural network implementation in Keras.
 
 
 
