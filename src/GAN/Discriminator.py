@@ -1,5 +1,4 @@
 from fastai.imports import torch
-from sklearn.preprocessing import OneHotEncoder
 from torch import nn
 import numpy as np
 from src.resources import constants as cnst
@@ -10,7 +9,7 @@ class Discriminator(nn.Module):
     def __init__(self, n_classes, img_shape):
         super(Discriminator, self).__init__()
 
-        self.model = nn.Sequential(
+        self.conv_layer = nn.Sequential(
             # input is (cnst.CHANNELS_NUM) x 28 x 28
             nn.Conv2d(cnst.CHANNELS_NUM, cnst.GAN_DIS_FEATURE_MAPS,
                       kernel_size=3, stride=2, padding=1, bias=False),
@@ -29,12 +28,19 @@ class Discriminator(nn.Module):
             nn.LeakyReLU(0.2, inplace=True),
             # out is (cnst.GAN_DIS_FEATURE_MAPS*4) x 4 x 4
             # ---------
+        )
+        self.conv_layer_out = nn.Sequential(
             nn.Conv2d(cnst.GAN_DIS_FEATURE_MAPS * 4, 1,
                       4, 1, 0, bias=False),
-            # Output is 1x1x1
-            # ---------
+            # out is 1x1x1
             nn.Sigmoid()
         )
+
+        self.fc_layer = nn.Sequential(
+            nn.Linear(cnst.GAN_DIS_FEATURE_MAPS*4 * 4 * 4, 1),
+            nn.Sigmoid()
+        )
+
 
 
     def forward(self, img):
@@ -43,5 +49,8 @@ class Discriminator(nn.Module):
         # embedded_tensor = torch.cuda.FloatTensor(transformed)
         # transformed_img = img.view(img.size(0), -1)
         # d_in = torch.cat((transformed_img,  embedded_tensor), -1)
-        validity = self.model(img)
-        return validity
+        res = self.conv_layer(img)
+        #final_res = self.conv_layer_out(res)
+        flat_res = res.reshape(res.size(0), -1)
+        final_res = self.fc_layer(flat_res)
+        return final_res
