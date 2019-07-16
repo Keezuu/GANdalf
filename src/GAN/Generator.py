@@ -9,9 +9,11 @@ class Generator(nn.Module):
     def __init__(self, n_classes, latent_dim, img_shape):
         super(Generator, self).__init__()
 
+        self.label_embedding = nn.Embedding(n_classes, n_classes)
+
         self.model = nn.Sequential(
             # input size is latent_dim
-            nn.ConvTranspose2d(latent_dim, 8 * cnst.GAN_GEN_FEATURE_MAPS,
+            nn.ConvTranspose2d(latent_dim + n_classes, 8 * cnst.GAN_GEN_FEATURE_MAPS,
                                kernel_size=3, stride=1, padding=0, bias=False),
             nn.BatchNorm2d(cnst.GAN_GEN_FEATURE_MAPS * 8),
             nn.ReLU(True),
@@ -36,6 +38,9 @@ class Generator(nn.Module):
             # ---------
         )
 
-    def forward(self, noise):
+    def forward(self, noise, labels):
+        labels = self.label_embedding(labels)
+        labels = labels.reshape(labels.size(0), labels.size(1), 1, 1)
+        noise = torch.cat((labels, noise), 1)
         img = self.model(noise)
         return img

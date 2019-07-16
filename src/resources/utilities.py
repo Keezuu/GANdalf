@@ -57,14 +57,14 @@ def denorm(x):
 def sample_image(G, n_row, name, path):
     """Saves a grid of generated digits ranging from 0 to n_classes"""
     # Sample noise
-    z = torch.cuda.FloatTensor(np.random.normal(0, 1, (n_row ** 2, cnst.GAN_LATENT_SIZE)))
+    z = torch.randn(n_row**2, cnst.GAN_LATENT_SIZE, 1, 1).cuda()    # Get labels ranging from 0 to n_classes for n rows
     # Get labels ranging from 0 to n_classes for n rows
     labels = np.array([num for _ in range(n_row) for num in range(n_row)])
     labels = torch.cuda.LongTensor(labels)
-    gen_imgs = G(z, labels.cpu())
+    gen_imgs = G(z, labels)
     if not os.path.exists(os.path.join(path, "img")):
         os.makedirs(os.path.join(path, "img"))
-    save_image(gen_imgs.reshape(gen_imgs.shape[0], 1, gen_imgs.shape[1], gen_imgs.shape[2]).data,
+    save_image(gen_imgs.data,
                os.path.join(path, "img",  name+".png"), nrow=n_row, normalize=True)
 
 def sample_same_label_image(G, available_labels, n_cols, name, path):
@@ -74,7 +74,7 @@ def sample_same_label_image(G, available_labels, n_cols, name, path):
     # Get labels ranging from 0 to n_classes for n rows
     labels = np.array([label  for label in available_labels for _ in range(n_cols)])
     labels = torch.cuda.LongTensor(labels)
-    gen_imgs = G(z, labels.cpu())
+    gen_imgs = G(z, labels)
     if not os.path.exists(os.path.join(path, "img")):
         os.makedirs(os.path.join(path, "img"))
     save_image(gen_imgs.reshape(gen_imgs.shape[0], 1, gen_imgs.shape[1], gen_imgs.shape[2]).data,
