@@ -28,24 +28,20 @@ z = FloatTensor(np.random.normal(0, 1, (num_of_images, cnst.GAN_LATENT_SIZE)))
 # Get labels ranging from 0 to n_classes for n rows
 labels = np.array([1 for x in range(num_of_images)])
 
-available_labels = [0]
+available_labels = [0,3,4,6,9]
 single_label_imgs_num = 10
-z = torch.cuda.FloatTensor(np.random.normal(0, 1,
-                                            (len(available_labels) * single_label_imgs_num,
-                                             cnst.GAN_LATENT_SIZE)))
+z = torch.randn(len(available_labels) * single_label_imgs_num, cnst.GAN_LATENT_SIZE, 1, 1).cuda()
 # Get labels ranging from 0 to n_classes for n rows
-labels = np.array([label for label in available_labels for _ in range(single_label_imgs_num)])
-#np.random.shuffle(labels)
 
-one_hot_labels = np.arange(10)
-G.train_one_hot(one_hot_labels)
+labels = np.array([label for label in available_labels for _ in range(single_label_imgs_num)])
+labels = torch.cuda.LongTensor(labels)
+
 gen_imgs = G(z, labels)
 
-save_image(gen_imgs.reshape(gen_imgs.shape[0], 1, gen_imgs.shape[1], gen_imgs.shape[2]).data,
-           os.path.join(cnst.GAN_SAMPLES_DIR, "generatedVIS3.png"), nrow=n_classess, normalize=True)
-save_image(gen_imgs.reshape(gen_imgs.shape[0], 1, gen_imgs.shape[1], gen_imgs.shape[2]).data,
-           os.path.join(cnst.GAN_SAMPLES_DIR, "generatedVIS4.png"), nrow=n_classess * 10, normalize=True)
+save_image(gen_imgs.data, os.path.join(cnst.GAN_SAMPLES_DIR, "generatedVIS3.png"), nrow=n_classess, normalize=True)
+save_image(gen_imgs.data, os.path.join(cnst.GAN_SAMPLES_DIR, "generatedVIS4.png"), nrow=n_classess * 10, normalize=True)
 gen_imgs = gen_imgs.cpu().data.numpy()
+labels = labels.cpu().data.numpy()
 
 # Move the data to CPU and then copy it to numpy array
 np.save(file=os.path.join(cnst.GAN_DATA_DIR, "gan_images.npy"), arr=gen_imgs)
