@@ -6,13 +6,11 @@ from src.GAN.Discriminator import Discriminator
 from src.GAN.Generator import Generator
 from src.resources.utilities import *
 
-
 # Get current date for naming folders
 date = datetime.datetime.now().strftime("%m%d%H%M%S")
 
 # Sets up the training dirs - createes them if they dont exist
 set_up_training_dirs(date)
-
 
 # Image processing
 # Normalize the images to [-1, 1]
@@ -42,7 +40,7 @@ D.apply(weights_init)
 G.apply(weights_init)
 print(G)
 print(D)
-# Create BCE loss function
+# Create MSE loss function
 mse_loss = nn.MSELoss().cuda()
 
 # Create optimizers as specified in DCGAN paper
@@ -72,7 +70,7 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
 
         # Train DCGAN on one batch
         g_loss, d_loss, real_score, fake_score = batch_train_gan(G, D, G_opt, D_opt, batch_size, real_imgs,
-                                                           real_labels, valid, fake, device)
+                                                                 real_labels, valid, fake, device)
 
         # Update statistics
         d_losses[epoch] = d_losses[epoch] * (i / (i + 1.)) + d_loss.data * (1. / (i + 1.))
