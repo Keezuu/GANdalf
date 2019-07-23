@@ -21,29 +21,41 @@ class Discriminator(nn.Module):
             # out is (cnst.GAN_DIS_FEATURE_MAPS) x 14 x 14
             # ---------
             nn.Conv2d(cnst.GAN_DIS_FEATURE_MAPS, cnst.GAN_DIS_FEATURE_MAPS * 2,
-                      3, 2, 1, bias=False),
+                      2, 2, 1, bias=False),
             nn.BatchNorm2d(cnst.GAN_DIS_FEATURE_MAPS * 2),
             nn.LeakyReLU(0.2, inplace=True),
-            # out is (cnst.GAN_DIS_FEATURE_MAPS*2) x 7 x 7
+            # out is (cnst.GAN_DIS_FEATURE_MAPS*2) x 8 x 8
             # ---------
             nn.Conv2d(cnst.GAN_DIS_FEATURE_MAPS * 2, cnst.GAN_DIS_FEATURE_MAPS * 4,
-                      3, 2, 1, bias=False),
+                      2, 1, 0, bias=False),
             nn.BatchNorm2d(cnst.GAN_DIS_FEATURE_MAPS * 4),
             nn.LeakyReLU(0.2, inplace=True),
-            # out is (cnst.GAN_DIS_FEATURE_MAPS*4) x 4 x 4
+            # out is (cnst.GAN_DIS_FEATURE_MAPS*4) x 7 x 7
+            # ---------
+            nn.Conv2d(cnst.GAN_DIS_FEATURE_MAPS * 4, cnst.GAN_DIS_FEATURE_MAPS * 8,
+                      2, 2, 1, bias=False),
+            nn.BatchNorm2d(cnst.GAN_DIS_FEATURE_MAPS * 8),
+            nn.LeakyReLU(0.2, inplace=True),
+            # out is (cnst.GAN_DIS_FEATURE_MAPS*8) x 4 x 4
             # ---------
         )
         self.conv_layer_out = nn.Sequential(
-            nn.Conv2d(cnst.GAN_DIS_FEATURE_MAPS * 4, 1,
+            nn.Conv2d(cnst.GAN_DIS_FEATURE_MAPS * 8, 1,
                       4, 1, 0, bias=False),
             # out is 1x1x1
             nn.Sigmoid()
         )
 
+    def preprocess(self, img, labels):
+        n_labels = self.label_embedding(labels)
+        n_labels = n_labels.reshape(n_labels.size(0), 1, 28, 28)
+        n_img = torch.cat((n_labels, img), 1)
+        return n_img
+
     def forward(self, img, labels):
-        labels = self.label_embedding(labels)
-        labels = labels.reshape(labels.size(0), 1, 28, 28)
-        img = torch.cat((labels, img), 1)
-        res = self.conv_layer(img)
+        n_img = self.preprocess(img, labels)
+
+        res = self.conv_layer(n_img )
         final_res = self.conv_layer_out(res)
+
         return final_res
