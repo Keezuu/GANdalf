@@ -9,18 +9,18 @@ from keras.regularizers import l2
 import datetime
 import numpy as np
 import os
-from src.network.Network import Network
+from src.classification.Network import Network
 import src.resources.constants as cnst
 
 
 class FFN(Network):
 
-    # Simple feed forward neural network
+    # Simple feed forward neural classification
 
     def __init__(self):
         self.model = Sequential()
 
-        # Create network with 4 hidden layers, input size is a flat array of pixels with
+        # Create classification with 4 hidden layers, input size is a flat array of pixels with
         # length equal to img width times img height
         self.model.add(Dense(1024, activation='relu', input_shape=(cnst.IMG_SIZE*cnst.IMG_SIZE,)))
         self.model.add(Dense(512, activation='relu'))

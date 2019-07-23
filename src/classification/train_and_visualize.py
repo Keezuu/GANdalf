@@ -1,8 +1,8 @@
 import datetime
 import os
 
-from src.network.FFN import FFN
-from src.network.CNN import CNN
+from src.classification.FFN import FFN
+from src.classification.CNN import CNN
 import src.resources.utilities as utils
 import matplotlib.pyplot as plt
 import src.resources.constants as cnst
@@ -48,7 +48,7 @@ def load_gan_train_mnist_val_data_flat():
     return (xg_train, yg_train), (x_test, y_test)
 
 
-# Starts the training and evaluation of convolutional neural network on MNIST dataset
+# Starts the training and evaluation of convolutional neural classification on MNIST dataset
 def run_cnn():
     cnn = CNN()
     #(x_train, y_train), (x_test, y_test) = utils.load_data(cnst.IMGS_AMOUNT, cnst.VAL_SPLIT)
@@ -56,7 +56,7 @@ def run_cnn():
     history = cnn.train(x_train, y_train, x_test, y_test)
     return history
 
-# Starts the training and evaluation of convolutional neural network on MNIST dataset mixed with GAN images
+# Starts the training and evaluation of convolutional neural classification on MNIST dataset mixed with GAN images
 def run_cnn_with_gan_data():
     cnn = CNN()
     (x_train, y_train), (x_test, y_test) = load_mixed_data()

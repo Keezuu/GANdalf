@@ -9,14 +9,14 @@ from keras.regularizers import l2
 import datetime
 import numpy as np
 import os
-from src.network.Network import Network
+from src.classification.Network import Network
 
 import src.resources.constants as cnst
 
 
 class CNN(Network):
 
-    # Simple feed forward neural network
+    # Simple feed forward neural classification
 
     def __init__(self):
         self.model = Sequential()
