@@ -1,89 +1,41 @@
-import datetime
-import os
-import torch
-import torchvision
-import torch.nn as nn
-from torchvision import transforms
-from torchvision.utils import save_image
-import matplotlib.pyplot as plt
-import pylab
-import numpy as np
-import torch.utils.data
+from src.resources.gan_utilities import *
 # Hyper-parameters
 from torchvision.transforms import transforms
 
 from src.GAN.Discriminator import Discriminator
 from src.GAN.Generator import Generator
-import src.resources.constants as cnst
-from src.resources.utilities import sample_image, denorm, generate_gif, save_statistics, sample_same_label_image
+from src.resources.utilities import *
 
-
-# From pytorch DCGAN tutorial
-# custom weights initialization called on netG and netD
-def weights_init(m):
-    classname = m.__class__.__name__
-    if classname.find('Conv') != -1:
-        nn.init.normal_(m.weight.data, 0.0, 0.02)
-    elif classname.find('BatchNorm') != -1:
-        nn.init.normal_(m.weight.data, 1.0, 0.02)
-        nn.init.constant_(m.bias.data, 0)
-
-
-# Create directories if they don't exist
-if not os.path.exists(cnst.GAN_SAMPLES_DIR):
-    os.makedirs(cnst.GAN_SAMPLES_DIR)
-
-if not os.path.exists(cnst.GAN_SAVE_DIR):
-    os.makedirs(cnst.GAN_SAVE_DIR)
+# Sets up the training dirs - createes them if they dont exist
+set_up_training_dirs()
 
 # Get current date for naming folders
-
 date = datetime.datetime.now().strftime("%m%d%H%M%S")
 
 # Image processing
 # Normalize the images to [-1, 1]
 transform = transforms.Compose([
     transforms.ToTensor(),
-    transforms.Normalize([0.5], [0.5])])
+    transforms.Normalize([0.5], [0.5])
 
-# Import MNIST dataset
-mnist = torchvision.datasets.MNIST(root=cnst.DATA_DIR,
-                                   train=True,
-                                   transform=transform,
-                                   download=True)
+])
 
-# Get only a part of the data if specified training size is less than the size of mnist dataset
-if cnst.GAN_MNIST_TRAINING_SIZE < len(mnist.data):
-    subset_indices = [x for x in range(cnst.GAN_MNIST_TRAINING_SIZE)]
-    mnist = torch.utils.data.Subset(mnist, subset_indices)
-    # Check how many instances of each class there is
-
-    cnt_labels = np.zeros(10)
-    for i in subset_indices:
-        cnt_labels[mnist[i][-1]] += 1
-    print("Number of image from given class: ")
-
-    for idx, val in enumerate(cnt_labels):
-        print(str(idx) + ": " + str(val))
+# Get dataloader
+data_loader = get_data(transform)
 
 # Get GPU
 device = torch.device("cuda:0" if (torch.cuda.is_available()) else "cpu")
-
-# Create data loader with shuffling allowed
-data_loader = torch.utils.data.DataLoader(dataset=mnist,
-                                          batch_size=cnst.GAN_BATCH_SIZE,
-                                          shuffle=True)
 
 FloatTensor = torch.cuda.FloatTensor
 LongTensor = torch.cuda.LongTensor
 
 # Create discriminator and generator and force them to use GPU
 D = Discriminator(img_shape=(28, 28), n_classes=10).cuda()
+# Create generator
+G = Generator(n_classes=10, latent_dim=cnst.GAN_LATENT_SIZE).cuda()
 # Apply the weights init with value from a Normal distribution with mean=0, stdev=0.02.
 # As stated in DCGAN paper
 D.apply(weights_init)
-# Create generator
-G = Generator(img_shape=(28, 28), n_classes=10, latent_dim=cnst.GAN_LATENT_SIZE).cuda()
 G.apply(weights_init)
 print(G)
 print(D)
@@ -216,7 +168,7 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
     save_statistics(d_losses, g_losses, fake_scores, real_scores, os.path.join(cnst.GAN_SAVE_DIR, date))
 
     # Save model at checkpoints
-    if (epoch + 1) % 50 == 0:
+    if (epoch + 1) % 5 == 0:
         torch.save(G.state_dict(), os.path.join(cnst.GAN_MODEL_DIR, date, 'G--{}.ckpt'.format(epoch + 1)))
         torch.save(D.state_dict(), os.path.join(cnst.GAN_MODEL_DIR, date, 'D--{}.ckpt'.format(epoch + 1)))
 
