@@ -18,6 +18,7 @@ def weights_init(m):
         nn.init.constant_(m.bias.data, 0)
 
 
+# Create dataloader and return it
 def get_data(transform):
     # Import MNIST dataset
     mnist = torchvision.datasets.MNIST(root=cnst.DATA_DIR,
