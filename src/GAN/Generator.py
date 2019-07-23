@@ -38,8 +38,8 @@ class Generator(nn.Module):
 
     def preprocess(self, noise, labels):
         n_labels = self.label_embedding(labels)
-        n_labels = labels.reshape(labels.size(0), labels.size(1), 1, 1)
-        n_noise = torch.cat((labels, noise), 1)
+        n_labels = labels.reshape(n_labels.size(0), n_labels.size(1), 1, 1)
+        n_noise = torch.cat((n_labels, noise), 1)
         return n_noise
 
     def forward(self, noise, labels):
