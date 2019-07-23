@@ -1,12 +1,10 @@
 from fastai.imports import torch
 from torch import nn
-import numpy as np
 from src.resources import constants as cnst
 
 
-# DCGAN architecture based on pytorch DCGAN tutorial
 class Generator(nn.Module):
-    def __init__(self, n_classes, latent_dim, img_shape):
+    def __init__(self, n_classes, latent_dim):
         super(Generator, self).__init__()
 
         self.label_embedding = nn.Embedding(n_classes, n_classes)
@@ -38,9 +36,13 @@ class Generator(nn.Module):
             # ---------
         )
 
+    def preprocess(self, noise, labels):
+        n_labels = self.label_embedding(labels)
+        n_labels = labels.reshape(labels.size(0), labels.size(1), 1, 1)
+        n_noise = torch.cat((labels, noise), 1)
+        return n_noise
+
     def forward(self, noise, labels):
-        labels = self.label_embedding(labels)
-        labels = labels.reshape(labels.size(0), labels.size(1), 1, 1)
-        noise = torch.cat((labels, noise), 1)
-        img = self.model(noise)
+        n_noise = self.preprocess(noise, labels)
+        img = self.model(n_noise)
         return img
