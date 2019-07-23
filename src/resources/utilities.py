@@ -13,13 +13,20 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def set_up_training_dirs():
+def set_up_training_dirs(date):
     # Create directories if they don't exist
     if not os.path.exists(cnst.GAN_SAMPLES_DIR):
         os.makedirs(cnst.GAN_SAMPLES_DIR)
 
     if not os.path.exists(cnst.GAN_SAVE_DIR):
         os.makedirs(cnst.GAN_SAVE_DIR)
+
+    if not os.path.exists(os.path.join(cnst.GAN_SAVE_DIR, date)):
+        os.makedirs(os.path.join(cnst.GAN_SAVE_DIR, date))
+    if not os.path.exists(os.path.join(cnst.GAN_SAMPLES_DIR, date)):
+        os.makedirs(os.path.join(cnst.GAN_SAMPLES_DIR, date))
+    if not os.path.exists(os.path.join(cnst.GAN_MODEL_DIR, date)):
+        os.makedirs(os.path.join(cnst.GAN_MODEL_DIR, date))
 
 
 def save_statistics(d_losses, g_losses, fake_scores, real_scores, path):

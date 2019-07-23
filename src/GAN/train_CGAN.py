@@ -6,11 +6,13 @@ from src.GAN.Discriminator import Discriminator
 from src.GAN.Generator import Generator
 from src.resources.utilities import *
 
-# Sets up the training dirs - createes them if they dont exist
-set_up_training_dirs()
 
 # Get current date for naming folders
 date = datetime.datetime.now().strftime("%m%d%H%M%S")
+
+# Sets up the training dirs - createes them if they dont exist
+set_up_training_dirs(date)
+
 
 # Image processing
 # Normalize the images to [-1, 1]
@@ -26,6 +28,7 @@ data_loader = get_data(transform)
 # Get GPU
 device = torch.device("cuda:0" if (torch.cuda.is_available()) else "cpu")
 
+# For better readability
 FloatTensor = torch.cuda.FloatTensor
 LongTensor = torch.cuda.LongTensor
 
@@ -67,53 +70,9 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
         real_imgs = imgs.cuda()
         real_labels = labels.cuda()
 
-        # -----------------
-        #  Train Generator
-        # -----------------
-
-        G_opt.zero_grad()
-
-        # Sample noise as generator input
-        z = torch.randn(batch_size, cnst.GAN_LATENT_SIZE, 1, 1, device=device)
-        gen_labels = LongTensor(np.random.randint(0, 10, batch_size))
-
-        # Generate a batch of images
-        gen_imgs = G(z, gen_labels)
-
-        # Loss measures generator's ability to fool the discriminator
-        validity = D(gen_imgs, gen_labels)
-
-        # We try to maximize log(D(G(z))) as it doesn't have vanishing gradients
-        # whereas trying to minimize log(1-D(G(z))) does
-        # Goodfellow et. al (2014)
-        g_loss = mse_loss(validity, valid)
-
-        g_loss.backward()
-        G_opt.step()
-
-        # ---------------------
-        #  Train Discriminator
-        # ---------------------
-
-        D_opt.zero_grad()
-
-        # Training on batch of fake and batch of real images separately
-        # as proposed in tips to training gans: https://github.com/soumith/ganhacks
-        # Loss for real images
-        validity_real = D(real_imgs, real_labels)
-        d_real_loss = mse_loss(validity_real, valid)
-        real_score = validity_real
-
-        # Loss for fake images
-        validity_fake = D(gen_imgs.detach(), gen_labels)
-        d_fake_loss = mse_loss(validity_fake, fake)
-        fake_score = validity_fake
-
-        # Total discriminator loss
-        d_loss = (d_real_loss + d_fake_loss) / 2
-
-        d_loss.backward()
-        D_opt.step()
+        # Train DCGAN on one batch
+        g_loss, d_loss, real_score, fake_score = batch_train_gan(G, D, G_opt, D_opt, batch_size, real_imgs,
+                                                           real_labels, valid, fake, device)
 
         # Update statistics
         d_losses[epoch] = d_losses[epoch] * (i / (i + 1.)) + d_loss.data * (1. / (i + 1.))
@@ -129,29 +88,8 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
         batches_done = epoch * len(data_loader) + i
         plt.clf()
 
-    # Show samples for debug purposes
-    if epoch % 5 == 0:
-        # Sample 4 noise and labels for debug and visualization purposes
-        z = torch.randn(4, cnst.GAN_LATENT_SIZE, 1, 1, device=device)
-        sample_labels = LongTensor(np.random.randint(0, 10, 4))
-
-        # Generate a batch of images
-        sample_imgs = G(z, sample_labels)
-        cpu_imgs = sample_imgs.detach().cpu().numpy()
-        cpu_imgs = np.squeeze(cpu_imgs)
-        for i, label in enumerate(sample_labels):
-            plt.title('Label is {label}'.format(label=label))
-            plt.imshow(cpu_imgs[i], cmap='gray')
-            plt.show()
-
-    # Create save folder
-
-    if not os.path.exists(os.path.join(cnst.GAN_SAVE_DIR, date)):
-        os.makedirs(os.path.join(cnst.GAN_SAVE_DIR, date))
-    if not os.path.exists(os.path.join(cnst.GAN_SAMPLES_DIR, date)):
-        os.makedirs(os.path.join(cnst.GAN_SAMPLES_DIR, date))
-    if not os.path.exists(os.path.join(cnst.GAN_MODEL_DIR, date)):
-        os.makedirs(os.path.join(cnst.GAN_MODEL_DIR, date))
+    # Show samples for debug purpose
+    show_samples(G, epoch, device)
 
     # Save real images
     if (epoch + 1) == 1:
@@ -161,8 +99,6 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
     if epoch % 5 == 0:
         sample_image(G, n_row=10, name=str(epoch).zfill(len(str(cnst.GAN_NUM_EPOCHS))),
                      path=os.path.join(cnst.GAN_SAMPLES_DIR, date))
-    #   sample_same_label_image(G, available_labels=one_hot_labels, n_cols=10, name=str(epoch).zfill(len(str(cnst.GAN_NUM_EPOCHS))),
-    #                path=os.path.join(cnst.GAN_SAMPLES_DIR+"-2", date))
 
     # Save and plot Statistics
     save_statistics(d_losses, g_losses, fake_scores, real_scores, os.path.join(cnst.GAN_SAVE_DIR, date))
@@ -176,7 +112,7 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
 torch.save(G.state_dict(), 'G.ckpt')
 torch.save(D.state_dict(), 'D.ckpt')
 
-# generate gif
+# generate gif visualizing progress of training
 filenames = os.listdir(os.path.join(cnst.GAN_SAMPLES_DIR, date, "img"))
 generate_gif(filenames, save_path=os.path.join(cnst.GAN_SAVE_DIR, date),
              read_path=os.path.join(cnst.GAN_SAMPLES_DIR, date))
