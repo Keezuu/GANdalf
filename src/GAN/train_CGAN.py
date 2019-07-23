@@ -32,14 +32,19 @@ LongTensor = torch.cuda.LongTensor
 
 # Create discriminator and generator and force them to use GPU
 D = Discriminator(img_shape=(28, 28), n_classes=10).cuda()
+
 # Create generator
 G = Generator(n_classes=10, latent_dim=cnst.GAN_LATENT_SIZE).cuda()
+
 # Apply the weights init with value from a Normal distribution with mean=0, stdev=0.02.
 # As stated in DCGAN paper
 D.apply(weights_init)
 G.apply(weights_init)
+
+# Visualize networks
 print(G)
 print(D)
+
 # Create MSE loss function
 mse_loss = nn.MSELoss().cuda()
 
@@ -78,6 +83,7 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
         real_scores[epoch] = real_scores[epoch] * (i / (i + 1.)) + real_score.mean().data * (1. / (i + 1.))
         fake_scores[epoch] = fake_scores[epoch] * (i / (i + 1.)) + fake_score.mean().data * (1. / (i + 1.))
 
+        # Print progress
         if i % 4 == 0:
             print('Epoch [{}/{}], Step [{}/{}], d_loss: {:.4f}, g_loss: {:.4f}, D(x): {:.2f}, D(G(z)): {:.2f}'
                   .format(epoch, cnst.GAN_NUM_EPOCHS, i + 1, total_step, d_loss.data, g_loss.data,
@@ -93,6 +99,7 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
     if (epoch + 1) == 1:
         images = imgs.view(imgs.size(0), 1, 28, 28)
         save_image(denorm(imgs.data), os.path.join(cnst.GAN_SAMPLES_DIR, date, 'real_images.png'))
+
     # Save sampled images
     if epoch % 5 == 0:
         sample_image(G, n_row=10, name=str(epoch).zfill(len(str(cnst.GAN_NUM_EPOCHS))),
