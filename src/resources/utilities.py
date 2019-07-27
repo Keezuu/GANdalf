@@ -236,3 +236,13 @@ def load_GAN_data(imgs_amount, val_split):
     y_train = keras.utils.to_categorical(y_train)
 
     return (x_train, y_train), (x_test, y_test)
+
+
+def save_info(path, epochs, batch, dis_feature_maps, gen_feature_maps):
+    with open(path, 'w+') as file:
+        lines = ["EPOCHS: "+str(epochs)+"\n","BATCH_SIZE: "+str(batch)+"\n",
+                 "DIS_FEAT_MAPS: "+str(dis_feature_maps)+"\n","GEN_FEAT_MAPS: "+str(gen_feature_maps)+"\n"]
+        file.writelines(lines)
+
+
+

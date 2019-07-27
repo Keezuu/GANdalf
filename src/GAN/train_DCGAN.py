@@ -99,6 +99,9 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
     if (epoch + 1) == 1:
         images = imgs.view(imgs.size(0), 1, 28, 28)
         save_image(denorm(imgs.data), os.path.join(cnst.GAN_SAMPLES_DIR, date, 'real_images.png'))
+        # Save text info about this train run
+        save_info(path=os.path.join(cnst.GAN_SAMPLES_DIR, date, 'info.txt'), epochs=cnst.GAN_NUM_EPOCHS,
+                batch=batch_size, dis_feature_maps=cnst.GAN_DIS_FEATURE_MAPS, gen_feature_maps=cnst.GAN_GEN_FEATURE_MAPS)
 
     # Save sampled images
     #if epoch % 5 == 0:
