@@ -2,8 +2,6 @@ import torchvision
 import torch.nn as nn
 from torch.nn.functional import mse_loss
 
-from src.resources.gan_utilities import *
-
 from src.resources.utilities import *
 
 
@@ -47,7 +45,7 @@ def get_data(transform):
         return data_loader
 
 
-def batch_train_gan(G, D, G_opt, D_opt, batch_size, real_imgs, real_labels, valid, fake, device):
+def batch_train_gan(G, D, G_opt, D_opt, loss,  batch_size, real_imgs, real_labels, valid, fake, device):
     """
     Train GAN on one batch.
     """
@@ -70,7 +68,7 @@ def batch_train_gan(G, D, G_opt, D_opt, batch_size, real_imgs, real_labels, vali
     # We try to maximize log(D(G(z))) as it doesn't have vanishing gradients
     # whereas trying to minimize log(1-D(G(z))) does
     # Goodfellow et. al (2014)
-    g_loss = mse_loss(validity, valid)
+    g_loss = loss(validity, valid)
 
     g_loss.backward()
     G_opt.step()
@@ -85,12 +83,12 @@ def batch_train_gan(G, D, G_opt, D_opt, batch_size, real_imgs, real_labels, vali
     # as proposed in tips to training gans: https://github.com/soumith/ganhacks
     # Loss for real images
     validity_real = D(real_imgs, real_labels)
-    d_real_loss = mse_loss(validity_real, valid)
+    d_real_loss = loss(validity_real, valid)
     real_score = validity_real
 
     # Loss for fake images
     validity_fake = D(gen_imgs.detach(), gen_labels)
-    d_fake_loss = mse_loss(validity_fake, fake)
+    d_fake_loss = loss(validity_fake, fake)
     fake_score = validity_fake
 
     # Total discriminator loss
