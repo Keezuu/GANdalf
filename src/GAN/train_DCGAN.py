@@ -74,7 +74,7 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
         real_labels = labels.cuda()
 
         # Train DCGAN on one batch
-        g_loss, d_loss, real_score, fake_score = batch_train_gan(G, D, G_opt, D_opt, batch_size, real_imgs,
+        g_loss, d_loss, real_score, fake_score = batch_train_gan(G, D, G_opt, D_opt, mse_loss, batch_size, real_imgs,
                                                                  real_labels, valid, fake, device)
 
         # Update statistics
@@ -101,9 +101,9 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
         save_image(denorm(imgs.data), os.path.join(cnst.GAN_SAMPLES_DIR, date, 'real_images.png'))
 
     # Save sampled images
-    if epoch % 5 == 0:
-        sample_image(G, n_row=10, name=str(epoch).zfill(len(str(cnst.GAN_NUM_EPOCHS))),
-                     path=os.path.join(cnst.GAN_SAMPLES_DIR, date))
+    #if epoch % 5 == 0:
+    sample_image(G, n_row=10, name=str(epoch).zfill(len(str(cnst.GAN_NUM_EPOCHS))),
+                 path=os.path.join(cnst.GAN_SAMPLES_DIR, date))
 
     # Save and plot Statistics
     save_statistics(d_losses, g_losses, fake_scores, real_scores, os.path.join(cnst.GAN_SAVE_DIR, date))
