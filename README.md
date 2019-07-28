@@ -79,11 +79,11 @@ The model was trained on batches of size 256, for 60 epochs.
 
 ### Accuracy throughout DCGAN training
 
-![alt text](https://github.com/Jkeezuz/GANdalf/raw/master/GAN_RESULTS/GAN_SAVES/save/accuracyDCGAN.png "")
+![alt text](https://github.com/Jkeezuz/GANdalf/raw/master/GAN_RESULTS/GAN_SAVES/save/accuracyDCGAN_new.png "")
 
 ### Loss throughout DCGAN training
 
-![alt text](https://github.com/Jkeezuz/GANdalf/raw/master/GAN_RESULTS/GAN_SAVES/save/lossDCGAN.png "")
+![alt text](https://github.com/Jkeezuz/GANdalf/raw/master/GAN_RESULTS/GAN_SAVES/save/lossDCGAN_new.png "")
 
 
 ## Results of the classification
