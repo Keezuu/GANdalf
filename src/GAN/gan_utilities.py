@@ -42,8 +42,11 @@ def get_data(transform):
         data_loader = torch.utils.data.DataLoader(dataset=mnist,
                                                   batch_size=cnst.GAN_BATCH_SIZE,
                                                   shuffle=True)
-        return data_loader
-
+    else:
+        data_loader = torch.utils.data.DataLoader(dataset=mnist,
+                                                  batch_size=cnst.GAN_BATCH_SIZE,
+                                                  shuffle=True)
+    return data_loader
 
 def batch_train_gan(G, D, G_opt, D_opt, loss,  batch_size, real_imgs, real_labels, valid, fake, device):
     """
