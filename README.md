@@ -117,7 +117,7 @@ Loss of network while training only on 10kGAN dataset: 3.025749439239502 </br>
 
 ## Summary
 
-The results are, of course, slightly dissapointing. Adding 10k of mnist images generated on <b>this</b> DCGAN model does not improve the results of classifying images on <b>these</b> CNN models. There's many things that affect those results. One possible explanation is that adding those generated mnist images adds more variation to the data distribution therefore CNNs learn distributions which are not present in the original MNIST dataset, it could be verified by training CNN on GAN+MNIST like I did but validating also on both of these datasets. 
+The results are, of course, slightly dissapointing. Adding 10k of mnist images generated on <b>this</b> DCGAN model does not improve the results of classifying images on <b>these</b> CNN models. There's many things that affect those results. One possible explanation is that adding those generated mnist images introduces more diversity to the data distribution the CNNs have to learn therefore CNNs learn distributions which are not present in the original MNIST dataset, it could be verified by training CNN on GAN+MNIST like I did but validating also on both of these datasets. 
 
 There's two things I can do now to improve the results.
 First of all is just to generate more data, having a trained GAN we can generate far more than 10K, we can try 50K images for example, with the 10k from mnist it would give us 60K images, just like the original. This is the first thing I want to try while trying to improve those results. Second thing is tweaking the parameters of DCGAN and also trying out different number of layers and kernels etc. which should provide better results. 
