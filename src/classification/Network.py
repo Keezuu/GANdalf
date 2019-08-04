@@ -22,15 +22,14 @@ class Network(ABC):
     def get_model(self):
         return self.model
 
-    def train(self, x_train, y_train, x_test, y_test):
+    def train(self, x_train, y_train, x_test, y_test, epochs):
 
         if self.model is None:
-            #   nw pozniej sie to lepiej zrobi
             return
 
         # Train the model. Epochs and batch size in constants.py
         history = self.model.fit(x=x_train, y=y_train, validation_data=(x_test, y_test),
-                                 epochs=cnst.EPOCHS, batch_size=cnst.BATCH_SIZE)
+                                 epochs=epochs, batch_size=cnst.BATCH_SIZE)
 
         # Get current date and time for easier identyfication of models
         date = datetime.datetime.now().strftime("%m%d%H%M")
