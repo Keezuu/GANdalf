@@ -1,12 +1,21 @@
-from src.resources.gan_utilities import *
-# Hyper-parameters
+# Basics
+import os
+import datetime
+import numpy as np
+import matplotlib as plt
+import src.resources.constants as cnst
+# Torch
+import torch
+from torch import nn
+from torchvision.utils import save_image
 from torchvision.transforms import transforms
-
+# Networks
 from src.GAN.Discriminator import Discriminator
 from src.GAN.Generator import Generator
-from src.resources.utilities import *
+# Utilities
+from src.GAN.gan_utilities import get_data, weights_init, batch_train_gan, show_samples
+from src.resources.utilities import set_up_training_dirs, save_info, denorm, sample_image, save_statistics, generate_gif
 
-# Get current date for naming folders
 date = datetime.datetime.now().strftime("%m%d%H%M%S")
 
 # Sets up the training dirs - createes them if they dont exist
@@ -101,7 +110,8 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
         save_image(denorm(imgs.data), os.path.join(cnst.GAN_SAMPLES_DIR, date, 'real_images.png'))
         # Save text info about this train run
         save_info(path=os.path.join(cnst.GAN_SAMPLES_DIR, date, 'info.txt'), epochs=cnst.GAN_NUM_EPOCHS,
-                batch=batch_size, dis_feature_maps=cnst.GAN_DIS_FEATURE_MAPS, gen_feature_maps=cnst.GAN_GEN_FEATURE_MAPS)
+                batch=batch_size, dis_feature_maps=cnst.GAN_DIS_FEATURE_MAPS, gen_feature_maps=cnst.GAN_GEN_FEATURE_MAPS,
+                  dataset_size=cnst.GAN_MNIST_TRAINING_SIZE)
 
     # Save sampled images
     #if epoch % 5 == 0:
