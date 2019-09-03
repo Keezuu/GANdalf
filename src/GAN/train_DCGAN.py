@@ -54,8 +54,8 @@ G.apply(weights_init)
 print(G)
 print(D)
 
-# Create MSE loss function
-mse_loss = nn.MSELoss().cuda()
+# Create BCE loss function
+bce_loss = nn.BCELoss().cuda()
 
 # Create optimizers as specified in DCGAN paper
 G_opt = torch.optim.Adam(G.parameters(), lr=0.0002, betas=(0.5, 0.999))
@@ -83,7 +83,7 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
         real_labels = labels.cuda()
 
         # Train DCGAN on one batch
-        g_loss, d_loss, real_score, fake_score = batch_train_gan(G, D, G_opt, D_opt, mse_loss, batch_size, real_imgs,
+        g_loss, d_loss, real_score, fake_score = batch_train_gan(G, D, G_opt, D_opt, bce_loss, batch_size, real_imgs,
                                                                  real_labels, valid, fake, device)
 
         # Update statistics
@@ -99,7 +99,7 @@ for epoch in range(cnst.GAN_NUM_EPOCHS):
                           real_score.mean().data, fake_score.mean().data))
 
         batches_done = epoch * len(data_loader) + i
-        plt.clf()
+#        plt.clf()
 
     # Show samples for debug purpose
     show_samples(G, epoch, device)
