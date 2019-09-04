@@ -60,9 +60,9 @@ There's separate layer for output because I was experimenting with having differ
 
 The labels in discriminator are embedded as 28 x 28 vectors and appended as additional channel to the image. The labels in generator are embedded as 10x1 vectors and appended to the noise.
 
-The model was trained on batches of size 256, for 60 epochs.
+The model was trained on batches of size 256, for 30 epochs.
 
-## Sample results after training on 10k MNIST images for 60 epochs
+## Sample results after training on 10k MNIST images for 30 epochs
 
 ![alt text](https://github.com/Jkeezuz/GANdalf/raw/master/GAN_RESULTS/GAN_SAMPLES/samples/last_epochDCGAN.png "")
 
@@ -87,20 +87,20 @@ The model was trained on batches of size 256, for 60 epochs.
 
 
 ## Results of the classification
-Accuracy of network while training only on 10kMNIST dataset: 0.979</br>
+Accuracy of network while training only on 10kMNIST dataset: 0.9785</br>
 
 ![alt text](https://github.com/Jkeezuz/GANdalf/raw/master/ALL_RESULTS/DCGAN_classification/cnn/netacc.png "")
 
-Loss of network while training only on 10kMNIST dataset: 0.09162351002503419</br>
+Loss of network while training only on 10kMNIST dataset: 0.09128456617254414</br>
 
 ![alt text](https://github.com/Jkeezuz/GANdalf/raw/master/ALL_RESULTS/DCGAN_classification/cnn/netloss.png "")
 
-Accuracy of network while training on 10kMNIST+10kGAN dataset: 0.9782051282051282</br>
+Accuracy of network while training on 10kMNIST+10kGAN dataset: 0.96875</br>
  (validation was done only on MNIST images not used for training!)
 
 ![alt text](https://github.com/Jkeezuz/GANdalf/raw/master/ALL_RESULTS/DCGAN_classification/cnn_mixed/netacc.png "")
 
-Loss of network while training on 10kMNIST+10kGAN dataset: 0.18733093237085985</br>
+Loss of network while training on 10kMNIST+10kGAN dataset: 0.14464044827783482</br>
 (validation was done only on MNIST images not used for training!)
 
 ![alt text](https://github.com/Jkeezuz/GANdalf/raw/master/ALL_RESULTS/DCGAN_classification/cnn_mixed/netloss.png "")
